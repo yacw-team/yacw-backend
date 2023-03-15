@@ -4,13 +4,33 @@
 
 ## Init
 
-### Using `make`
+### Install Pre Commit Check 
+
+#### Install `golangci-lint`
+
+[Install tutorial](https://golangci-lint.run/usage/install/#local-installation)
+
+#### Install `pre-commit`
+
+```bash
+pip install pre-commit
+```
+
+#### Run `pre-commit`
+
+```bash
+pre-commit install
+```
+
+### Install Go Dependencies
+
+#### Using `make`
 
 ```bash
 make init
 ```
 
-### Using Command
+#### Using Command
 
 ```bash
 go mod download

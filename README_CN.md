@@ -4,13 +4,33 @@
 
 ## 初始化
 
-### 使用 `make`
+### 安装 Commit 前检查工具
+
+#### 安装 `golangci-lint`
+
+[Install tutorial](https://golangci-lint.run/usage/install/#local-installation)
+
+#### 安装 `pre-commit`
+
+```bash
+pip install pre-commit
+```
+
+#### 运行 `pre-commit`
+
+```bash
+pre-commit install
+```
+
+### 安装 Go 依赖
+
+#### 使用 `make`
 
 ```bash
 make init
 ```
 
-### 使用命令
+#### 使用命令
 
 ```bash
 go mod download
