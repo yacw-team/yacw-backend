@@ -9,6 +9,7 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/hello", controllers.Hello)
+	r.GET("/chat", controllers.Chat)
 
 	return r
 }
