@@ -6,6 +6,7 @@ init:
 	go get -u gorm.io/driver/sqlite
 	go get -u github.com/sirupsen/logrus
 	go get -u github.com/joho/godotenv
+	go get -u github.com/sashabaranov/go-openai
 run:
 	go run main.go
 build:
