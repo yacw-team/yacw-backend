@@ -3,11 +3,16 @@ module github.com/yacw-team/yacw
 go 1.19
 
 require (
+	github.com/gin-gonic/gin v1.9.0
+	gorm.io/driver/sqlite v1.4.4
+	gorm.io/gorm v1.24.6
+)
+
+require (
 	github.com/antonfisher/nested-logrus-formatter v1.3.1 // indirect
 	github.com/bytedance/sonic v1.8.5 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
@@ -33,6 +38,4 @@ require (
 	golang.org/x/text v0.8.0 // indirect
 	google.golang.org/protobuf v1.29.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/driver/sqlite v1.4.4 // indirect
-	gorm.io/gorm v1.24.6 // indirect
 )
