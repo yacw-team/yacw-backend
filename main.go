@@ -9,5 +9,9 @@ func main() {
 	utils.InitDB()
 
 	r := routes.SetupRouter()
-	r.Run()
+	err := r.Run()
+	if err != nil {
+		print("Something went wrong!")
+		panic(err)
+	}
 }
