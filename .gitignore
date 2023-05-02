@@ -20,8 +20,5 @@
 # Go workspace file
 go.work
 
-# SQLite file
-*.db
-
 # idea files
 .idea/
