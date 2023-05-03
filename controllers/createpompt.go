@@ -5,6 +5,7 @@ import (
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
+	"strings"
 )
 
 // CreatePrompt 用户创建prompt
@@ -13,6 +14,14 @@ func CreatePrompt(c *gin.Context) {
 	modelName := c.PostForm("name")
 	description := c.PostForm("description")
 	prompts := c.PostForm("prompts")
+
+	if len(strings.TrimSpace(modelName)) == 0 {
+		c.JSON(http.StatusBadRequest, "名称不能为空")
+	}
+
+	if len(strings.TrimSpace(prompts)) == 0 {
+		c.JSON(http.StatusBadRequest, "prompt不能为空")
+	}
 
 	prompt := models.Prompt{
 		Uid:         uid,
