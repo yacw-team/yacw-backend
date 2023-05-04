@@ -3,7 +3,7 @@ package models
 type Personality struct {
 	Id        int
 	ModelName string
-	Detail    int
+	Details   string
 	Prompt    string
 	Uid       string
 	Designer  int
