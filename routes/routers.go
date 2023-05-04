@@ -6,6 +6,9 @@ import (
 	"github.com/yacw-team/yacw/controllers/v1/chat"
 	"os"
 	"path"
+
+	"github.com/gin-gonic/gin"
+	"github.com/yacw-team/yacw/controllers"
 )
 
 func SetupRouter() *gin.Engine {
