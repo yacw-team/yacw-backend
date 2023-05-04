@@ -10,7 +10,7 @@ import (
 
 // CreatePrompt 用户创建prompt
 func CreatePrompt(c *gin.Context) {
-	uid := utils.HashAndSalt(c.PostForm("apiKey"))
+	uid := utils.Encrypt(c.PostForm("apiKey"))
 	modelName := c.PostForm("name")
 	description := c.PostForm("description")
 	prompts := c.PostForm("prompts")
@@ -28,11 +28,12 @@ func CreatePrompt(c *gin.Context) {
 		ModelName:   modelName,
 		Description: description,
 		Prompts:     prompts,
+		Designer:    1,
 	}
 
 	err := utils.DB.Table("prompt").Create(&prompt).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "NO")
+		c.JSON(http.StatusBadRequest, "数据库读写出错")
 		return
 	}
 	c.JSON(http.StatusOK, "OK")

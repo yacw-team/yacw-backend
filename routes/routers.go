@@ -19,7 +19,7 @@ func SetupRouter() *gin.Engine {
 func ApiPrefixMiddleware() gin.HandlerFunc {
 	apiPath := os.Getenv("API_PATH")
 	if apiPath == "" {
-		apiPath = "/api"
+		apiPath = "/ "
 	}
 	return func(c *gin.Context) {
 		c.Request.URL.Path = path.Join(apiPath, c.Request.URL.Path)

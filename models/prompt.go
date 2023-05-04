@@ -9,5 +9,5 @@ type Prompt struct {
 	ExampleOutput string `gorm:"column:exampleoutput" json:"exampleOutput"`
 	Prompts       string `json:"content"`
 	Uid           string `json:"-"`
-	Designer      string `json:"-"`
+	Designer      int64  `json:"-"`
 }

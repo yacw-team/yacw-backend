@@ -10,7 +10,7 @@ import (
 // DeletePrompt 删除用户创建的prompt
 func DeletePrompt(c *gin.Context) {
 
-	uid := utils.HashAndSalt(c.PostForm("apiKey")) //用户id
+	uid := utils.Encrypt(c.PostForm("apiKey")) //用户id
 	id := c.PostForm("promptsId")
 
 	err := utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error
