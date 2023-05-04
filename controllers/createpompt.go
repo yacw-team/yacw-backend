@@ -10,7 +10,7 @@ import (
 
 // CreatePrompt 用户创建prompt
 func CreatePrompt(c *gin.Context) {
-	uid := utils.EncryptPassword(c.PostForm("apiKey"))
+	uid := utils.HashAndSalt(c.PostForm("apiKey"))
 	modelName := c.PostForm("name")
 	description := c.PostForm("description")
 	prompts := c.PostForm("prompts")
