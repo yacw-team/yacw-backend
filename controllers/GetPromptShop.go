@@ -8,7 +8,7 @@ import (
 )
 
 // GetPrompts 获取prompt商店的内容
-func GetPrompts(c *gin.Context) {
+func GetPromptShop(c *gin.Context) {
 	var prompts []models.Prompt
 	utils.DB.Table("prompt").Where("designer = ?", 0).Find(&prompts)
 	c.JSON(http.StatusOK, prompts)

@@ -10,7 +10,8 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	r.Use(ApiPrefixMiddleware())
-	r.GET("/v1/chat/prompts", controllers.GetPrompts)
+	r.GET("/v1/chat/prompts", controllers.GetPromptShop)
+	r.GET("/v1/chat/myprompts", controllers.GetMyPrompt)
 	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
 	return r

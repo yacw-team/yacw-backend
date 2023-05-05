@@ -25,7 +25,7 @@ func CreatePrompt(c *gin.Context) {
 
 	prompt := models.Prompt{
 		Uid:         uid,
-		ModelName:   modelName,
+		PromptName:  modelName,
 		Description: description,
 		Prompts:     prompts,
 		Designer:    1,
@@ -36,5 +36,10 @@ func CreatePrompt(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, "数据库读写出错")
 		return
 	}
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, gin.H{
+		"id":          prompt.Id,
+		"name":        prompt.PromptName,
+		"description": prompt.Description,
+		"prompts":     prompt.Prompts,
+	})
 }
