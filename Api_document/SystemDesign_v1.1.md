@@ -22,74 +22,80 @@
 
 程序界面将以 Web 页面的形式在浏览器中执行，通过 HTTP 协议与后端服务器进行通信。
 
-![部署架构设计1](imgs/系统设计/系统架构设计/部署架构设计1.png)
+![部署架构设计1](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/系统架构设计/部署架构设计1.png)
 
 #### Web 容器应用部署
 
 程序将被包装进 Tauri 等 Web 容器应用中，通过本地 API 与后端服务器进行通信。
 
-![部署架构设计2](imgs/系统设计/系统架构设计/部署架构设计2.png)
+![部署架构设计2](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/系统架构设计/部署架构设计2.png)
 
 ### 2.2 软件技术架构设计
 
-![技术架构图](imgs/系统设计/系统架构设计/软件架构设计.png)
+![技术架构图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/系统架构设计/软件架构设计.png)
 
 ## 三、系统功能模块
 
 ### 3.1 总体功能模块
 
-![功能模块图](imgs/系统设计/功能模块/功能模块图.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/功能模块/功能模块图.png)
 
 ### 3.1.1 对话功能模块
 
-![功能模块图](imgs/系统设计/功能模块/对话功能模块.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/功能模块/对话功能模块.png)
 
 ### 3.1.2 翻译功能模块
 
-![功能模块图](imgs/系统设计/功能模块/翻译功能模块.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/功能模块/翻译功能模块.png)
 
 ### 3.1.3 游戏功能模块
 
-![功能模块图](imgs/系统设计/功能模块/游戏功能模块.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/功能模块/游戏功能模块.png)
 
 ### 3.1.4 心理咨询功能模块
 
-![功能模块图](imgs/系统设计/功能模块/心理咨询功能模块.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/功能模块/心理咨询功能模块.png)
 
 ## 四、类图
 
 ## 五、用例图
 
-![用例图](imgs/系统设计/用例图.png)
+![用例图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/用例图.png)
 
 ## 六、泳道图
 
 ### 6.1 对话功能
+
     用户通过输入apikey才进入对话界面，之后需要选择prompt和character进行使用，
     其中这两个都可以在商店中寻找或者自己进行新的创建，选择后在后台形成完整的会话对象，
     数据库用来存储会话对象，之后openai会先判断apikey是否有效，
     无效则生成错误提示，有效就会生成回答，并将回答储存到数据库，在前台显示结果。
-![功能模块图](imgs/系统设计/泳道图/对话泳道图.png)
+
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/泳道图/对话泳道图.png)
 
 ### 6.2 翻译功能
+
     用户点击进入翻译界面，然后完成输入框的填入以及进行语言和语境的选择，后台便会接收到数据，
     将输入框的信息添加入数据库，之后调用api接口，实现openai的翻译，再将翻译结果储存在数据库中，
     并显示在前台界面。
 
-![功能模块图](imgs/系统设计/泳道图/translate.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/泳道图/translate.png)
 
 ### 6.3 游戏功能
+
     用户点击进入游戏界面，首先需要选择游戏背景，点击确定后判定是否选择游戏背景，成功则将背景储存进数据库中，
     openai开始生成故事选项，然后openai生成四个选项，供玩家选择，玩家选择后由openai生成新的剧情，
     之后openai判断新的剧情中玩家是否结束游戏或者通关，如果是，则不需要在生成选项，若否，则继续生成四个选项供玩家选择。
-![功能模块图](imgs/系统设计/泳道图/game.png)
+
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/泳道图/game.png)
 
 ### 6.4 心理咨询功能
+
     用户输入apikey进入咨询方向界面，从后台查询数据库获取咨询方向信息，并在前台显示有什么咨询方向，
     用户选择咨询方向后可以选择是否要导入评估报告，如果是，则会获取历史报告，并选择评估报告，否则可以直接输入咨询的对话，形成会话对象。
     这时候openai便会判断apikey是否有效，有效则会生成回答，并存储这次的数据，并显示结果。
 
-![功能模块图](imgs/系统设计/泳道图/心理咨询泳道图.png)
+![功能模块图](/Users/huyanjie/Documents/git/团队项目/Alpha冲刺/yacw-backend/api_document/imgs/系统设计/泳道图/心理咨询泳道图.png)
 
 ## 七、接口设计
 
@@ -108,11 +114,11 @@ Req:
 ```
 {
     apiKey: string,
-    modelId: string,
+    modelId: string,+8
     content: {
-        personalityId: string,
+        personalityId: string,//构造system
         promptsId: string,
-        system: string,      // user input
+        user: string,      // user input
     }
 }
 ```
@@ -126,7 +132,9 @@ Res:
     content: {
         personalityId: string,
         promptsId: string,
-        system: string,      // user input
+        user: string,      // user input
+        assistant:string,
+        title:string,
     },
 }
 ```
@@ -173,13 +181,15 @@ Res:
         user: string,
         assistant: string,
     },
-    id{
+    id:{
         usermsgid:string,
         assmsgid:string,
     }
 }
 ```
+
 #### 根据uid获得chataid
+
 URL: POST /v1/chat/getchat
 
 Req:
@@ -194,7 +204,7 @@ Res:
 
 ```
 {
-    chat[
+    chat:[
         {
             chatID:string,
             system:string,
@@ -202,7 +212,9 @@ Res:
     ]
 }
 ```
+
 #### 根据chatid获得message
+
 URL: POST /v1/chat/getmessage
 
 Req:
@@ -220,20 +232,12 @@ Res:
 {
     chatId:string,
 
-    [
-        {
-        content: {
-            user: string,
-            assistant: string,
-        },
-        content: {
-            user: string,
-            assistant: string,
-        },
-    },
-    
-    
-    ]
+    messages:[
+                {
+                  type: string,
+                  content: string
+                },
+    				]
 }
 ```
 
@@ -250,6 +254,7 @@ Res:
             id: string,
             name: string,					//名称
             description: string,	//描述
+            icon:string,					//表情
             prompts:string,				//具体的prompt
         },
         ...
@@ -292,6 +297,7 @@ Req:
     apiKey: string,
     name: string,					//名称
     description: string,	//描述
+    icon:string,            //
     prompts: string,			//具体的prompts
 }
 ```
@@ -303,6 +309,7 @@ Res:
     id: string,
     name: string,					//名称
     description: string,	//描述
+    icon:string,					//
     prompts: string,			//具体的prompts
 }
 ```
@@ -411,24 +418,7 @@ Req:
 Res:
 200 OK
 
-#### 获取模型列表
 
-URL：GET /v1/chat/model
-
-Res:
-
-```
-{
-    model: [
-        {
-            id: string,
-            name: string,
-            description: string,
-        },
-        ...
-    ],
-}
-```
 
 ### 7.2 翻译界面接口设计
 
@@ -444,8 +434,8 @@ Req:
 {
     apiKey: string,
     content: {
-        emotionId: string,
-        literatureId: string,
+        emotion: string,
+        style: string,
         preTranslate: string,
     },
     from: string,
@@ -458,8 +448,8 @@ Res:
 ```
 {
     content: {
-        emotionId: string,
-        literatureId: string,
+        emotion: string,
+        style: string,
         preTranslate: string,
         translated: string,
     },
@@ -469,131 +459,6 @@ Res:
 ```
 
 
-
-#### 获取情感列表
-
-URL：GET /v1/translate/emotion
-
-Res:
-
-```
-{
-    emotion: [
-        {
-            id: string,
-            name: string,
-            description: string,
-            designer:string,      //区分是系统的还是用户创建的
-        },
-        ...
-    ],
-}
-```
-
-
-
-#### 创建用户情感
-
-URL：POST /v1/translate/emotion
-
-Req:
-
-```
-{
-    apiKey: string,
-    name: string,
-    description: string,
-    emotion: string,
-}
-```
-
-Res:
-
-```
-{
-    id: string,
-    name: string,
-    description: string,
-    emotion: string,
-}
-```
-
-#### 删除用户情感
-
-URL：DELETE /v1/translate/emotion
-
-Req:
-
-```
-{
-    apiKey: string,
-    emotionId: string,
-}
-```
-
-Res:
-200 OK
-
-#### 获取文体列表
-
-URL：GET /v1/translate/literature
-
-Res:
-
-```
-{
-    literature: [
-        {
-            id: string,
-            name: string,
-            description: string,
-        },
-        ...
-    ],
-}
-```
-
-#### 创建用户文体
-
-URL：POST /v1/translate/literature
-
-Req:
-
-```
-{
-    apiKey: string,
-    name: string,
-    description: string,
-    literature: string,
-}
-```
-
-Res:
-
-```
-{
-    id: string,
-    name: string,
-    description: string,
-    literature: string,
-}
-```
-
-#### 删除用户文体
-
-URL：DELETE /v1/translate/literature
-
-Req:
-
-```
-{
-    apiKey: string,
-    literatureId: string,
-}
-```
-
-Res:
-200 OK
 
 ### 7.3 心理咨询界面接口设计
 
