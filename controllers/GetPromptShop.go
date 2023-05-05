@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// GetPrompts 获取prompt商店的内容
+// GetPromptShop 获取prompt商店的内容
 func GetPromptShop(c *gin.Context) {
 	var prompts []models.Prompt
 	utils.DB.Table("prompt").Where("designer = ?", 0).Find(&prompts)
