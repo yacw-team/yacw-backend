@@ -1,17 +1,17 @@
-package utils
+package models
 
 type ChatConversation struct {
 	Id           int
-	SystemPrompt string
-	Uid          string
-	ModelId      int
-	PromptId     int
+	SystemPrompt string `gorm:"column:systemprompt"`
+	Uid          string `gorm:"column:uid"`
+	ModelId      int    `gorm:"column:modelid"`
+	PromptId     int    `gorm:"column:promptid"`
 }
 
 type ChatMessage struct {
 	Id      int
 	Content string
-	ChatId  int
+	ChatId  int `gorm:"column:chatid"`
 	Actor   int
 }
 
@@ -21,14 +21,14 @@ type Game struct {
 	Background   string
 	Protagonist  string
 	Goal         string
-	SystemPrompt string
+	SystemPrompt string `gorm:"column:systemprompt"`
 }
 
 type GameMessage struct {
 	Id      int
 	Content string
 	Actor   int
-	GameId  int
+	GameId  int `gorm:"column:gameid"`
 }
 
 type Literature struct {
@@ -41,46 +41,34 @@ type Literature struct {
 
 type Personality struct {
 	Id        int
-	ModelName string
+	ModelName string `gorm:"column:modelname"`
 	Details   string
 	Prompt    string
 	Uid       string
 	Designer  int
 }
 
-type Prompt struct {
-	Id            int
-	ModelName     string
-	Description   string
-	Details       string
-	ExampleInput  string
-	ExampleOutput string
-	Prompts       string
-	Uid           string
-	Designer      int
-}
-
 type PsychologyConversation struct {
 	Id            int
-	SystemPrompt  string
+	SystemPrompt  string `gorm:"column:systemprompt"`
 	Uid           string
-	PersonalityId int
+	PersonalityId int `gorm:"column:personalityid"`
 }
 
 type PsychologyMessage struct {
 	Id           int
 	Content      string
-	PsychologyId int
+	PsychologyId int `gorm:"column:psychologyid"`
 	Actor        int
 }
 
 type Translation struct {
 	Id           int
 	Uid          string
-	OriginLang   string
-	GoalLang     string
-	EmotionId    int
-	LiteratureId int
+	OriginLang   string `gorm:"column:originlang"`
+	GoalLang     string `gorm:"column:goallang"`
+	EmotionId    int    `gorm:"column:emotionid"`
+	LiteratureId int    `gorm:"column:literatureid"`
 	Input        string
 	Output       string
 }

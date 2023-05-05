@@ -1,11 +1,11 @@
 package routes
 
 import (
-	"os"
-	"path"
-
 	"github.com/gin-gonic/gin"
 	"github.com/yacw-team/yacw/controllers"
+	"github.com/yacw-team/yacw/controllers/v1/chat"
+	"os"
+	"path"
 )
 
 func SetupRouter() *gin.Engine {
@@ -14,6 +14,9 @@ func SetupRouter() *gin.Engine {
 	r.GET("/v1/chat/prompts", controllers.GetPrompts)
 	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
+	r.POST("/v1/chat/new", chat.NewChat)
+	r.DELETE("/v1/chat/chat", chat.DeleteChat)
+	r.POST("/v1/chat/chat", chat.SendChat)
 	return r
 }
 
