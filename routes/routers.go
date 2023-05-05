@@ -16,6 +16,7 @@ func SetupRouter() *gin.Engine {
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
 	r.POST("/v1/chat/new", chat.NewChat)
 	r.DELETE("/v1/chat/chat", chat.DeleteChat)
+	r.POST("/v1/chat/chat", chat.SendChat)
 	return r
 }
 
