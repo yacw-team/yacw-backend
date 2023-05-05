@@ -40,26 +40,25 @@ type ResponseId struct {
 func SendChat(c *gin.Context) {
 	var request ChattingRequest
 	var response ChattingResponse
-	var err = c.BindJSON(&request)
+	err := c.BindJSON(&request)
 	response.ChatId = request.ChatId
 	response.Content.User = request.Content.User
-	//uid := utils.EncryptPassword(request.ApiKey)
-	chatid, errChange := strconv.Atoi(request.ChatId)
+	chatId, errChange := strconv.Atoi(request.ChatId)
 	var max int
+	var userMessage models.ChatMessage
+	var assistantMessage models.ChatMessage
+	var assistantResponse openai.ChatCompletionResponse
 	if err == nil && errChange == nil {
-		var userMessage models.ChatMessage
 		utils.DB.Table("chatmessage").Select("max(id) a").Find(&max)
 		userMessage.Id = max + 1
 		response.Id.UserMsgId = strconv.Itoa(max + 1)
 		userMessage.Content = request.Content.User
-		userMessage.ChatId = chatid
+		userMessage.ChatId = chatId
 		userMessage.Actor = 1
 		utils.DB.Table("chatmessage").Create(&userMessage)
-		var assistantMessage models.ChatMessage
 		assistantMessage.Id = max + 2
-		assistantMessage.ChatId = chatid
+		assistantMessage.ChatId = chatId
 		assistantMessage.Actor = 2
-		var assistantResponse openai.ChatCompletionResponse
 		assistantResponse = ChattingWithGPT3Dot5Turbo(request.ApiKey, request.Content.User)
 		assistantMessage.Content = assistantResponse.Choices[0].Message.Content
 		response.Id.AssMsgId = strconv.Itoa(max + 2)
