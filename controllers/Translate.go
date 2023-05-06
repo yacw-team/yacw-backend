@@ -23,7 +23,11 @@ type formData struct {
 // Translate 翻译
 func Translate(c *gin.Context) {
 	var formData formData
-	c.BindJSON(&formData)
+	err := c.BindJSON(&formData)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "数据绑定错误")
+		return
+	}
 	fmt.Println(formData.APIKey + "知识")
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(formData.APIKey)
