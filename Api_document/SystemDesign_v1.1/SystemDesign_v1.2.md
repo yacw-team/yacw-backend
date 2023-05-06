@@ -105,6 +105,28 @@
 
 入口：/v1/chat
 
+#### 用户输入apiKey
+
+URL：POST/v1/chat/apikey
+
+Req:
+
+```
+{
+	apiKey:string,
+}
+```
+
+Res:
+
+```
+200 OK
+
+401 Unauthorized //api错误
+```
+
+
+
 #### 新建对话(发送的第一条对话)
 
 URL: POST /v1/chat/new
@@ -114,7 +136,7 @@ Req:
 ```
 {
     apiKey: string,
-    modelId: string,+8
+    modelID: int,
     content: {
         personalityId: string,//构造system
         user: string,      // user input
@@ -127,7 +149,7 @@ Res:
 ```
 {
     chatId: string,
-    modelId: string,
+    model: string,
     content: {
         personalityId: string,
         user: string,      // user input
@@ -241,7 +263,7 @@ Res:
 
 #### 获取 Prompts 商店内容
 
-URL：GET /v1/chat/prompts
+URL：GET /v1/chat/prompts?tyep=?
 
 Res:
 
@@ -431,6 +453,7 @@ Req:
 ```
 {
     apiKey: string,
+    modelId:int
     content: {
         emotion: string,
         style: string,
