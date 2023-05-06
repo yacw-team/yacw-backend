@@ -23,4 +23,4 @@ go.work
 # idea files
 .idea/
 
-.DS_Store
+*.DS_Store
