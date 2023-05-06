@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 // 绑定的结构体
 type formData struct {
 	APIKey  string `json:"apiKey"`
+	ModelId int    `json:"modelid"`
 	Content struct {
 		Emotion      string `json:"emotion"`
 		Style        string `json:"style"`
@@ -28,7 +28,7 @@ func Translate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, "数据绑定错误")
 		return
 	}
-	fmt.Println(formData.APIKey + "知识")
+
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(formData.APIKey)
 	ctx := context.Background()
@@ -37,8 +37,10 @@ func Translate(c *gin.Context) {
 	origin := formData.From
 	//目标语言
 	goal := formData.To
-
+	//情感
 	emotion := formData.Content.Emotion
+	//模型的id
+	modelId := formData.ModelId
 
 	if emotion == "" {
 		emotion = "normal"
@@ -59,7 +61,7 @@ func Translate(c *gin.Context) {
 	prompt += user
 
 	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo,
+		Model:     model[modelId],
 		MaxTokens: 100,
 		Messages: []openai.ChatCompletionMessage{
 			{
@@ -92,7 +94,6 @@ func Translate(c *gin.Context) {
 	resp, err := client.CreateChatCompletion(ctx, req)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err)
-		fmt.Println(err)
 		return
 	}
 

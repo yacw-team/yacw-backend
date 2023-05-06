@@ -8,3 +8,11 @@ type Prompt struct {
 	Uid         string `json:"-"`
 	Designer    int64  `json:"-"`
 }
+
+type ChatMessage struct {
+	Id      int
+	Content string
+	ChatId  int `gorm:"column:chatid"`
+	Actor   string
+	Show    int
+}

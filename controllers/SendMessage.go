@@ -4,9 +4,13 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
+	"strconv"
 )
+
+var model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k", "gpt-4-32K-0314", "gpt-4-0314"}
 
 // 接受json的格式
 type reqMessage struct {
@@ -15,14 +19,6 @@ type reqMessage struct {
 	Content struct {
 		User string `json:"user"`
 	}
-}
-
-// 写入数据库的message的结构
-type chatMessage struct {
-	content string `gorm:"content"`
-	chatId  string `gorm:"chatid"`
-	actor   int    `gorm:"actor"`
-	show    int    `gorm:"show"`
 }
 
 // SendMessage 发送对话
@@ -37,24 +33,29 @@ func SendMessage(c *gin.Context) {
 
 	//获取数据
 	apiKey := reqMessage.ApiKey
-	chatId := reqMessage.ChatId
+	chatId, err := strconv.Atoi(reqMessage.ChatId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "字符串转数字出错")
+		return
+	}
 	user := reqMessage.Content.User
 
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(apiKey)
 	ctx := context.Background()
 
-	//查找system字段
-	var system string
-	err = utils.DB.Table("chatmessage").Where("chatId = ? AND actor = ?", chatId, 0).Select("content").Scan(&system).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据库查询错误")
-		return
-	}
+	//查找第一句system
+	var systemMessage models.ChatMessage
+	err = utils.DB.Table("chatmessage").Where("chatid = ? AND actor = ?", chatId, "system").Find(&systemMessage).Error
+
+	//查找modelId
+	var modelId int
+	err = utils.DB.Table("chatconversation").Where("id = ?", chatId).Select("modelid").Scan(&modelId).Error
 
 	//查找历史的对话
 	var history []string
-	err = utils.DB.Table("chatmessage").Where("chatId = ? AND (actor = ? OR actor = ?)", chatId, 1, 2).Select("content").Scan(&history).Error
+	err = utils.DB.Table("chatmessage").Where("chatId = ? AND (actor = ? OR actor = ?)", chatId, "user", "assistant").Select("content").Scan(&history).Error
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, "数据库查询错误")
 		return
@@ -70,13 +71,13 @@ func SendMessage(c *gin.Context) {
 	message = append([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
-			Content: system,
+			Content: systemMessage.Content,
 		},
 	}, message...)
 
 	//构造请求体
 	req := openai.ChatCompletionRequest{
-		Model:     openai.GPT3Dot5Turbo,
+		Model:     model[modelId],
 		MaxTokens: 100,
 		Messages:  message,
 	}
@@ -90,20 +91,20 @@ func SendMessage(c *gin.Context) {
 	assistant := resp.Choices[0].Message.Content
 
 	//将用户的对话写入数据库
-	err = utils.DB.Table("chatmessage").Create(chatMessage{
-		content: user,
-		chatId:  chatId,
-		actor:   1, //代表是用户
-		show:    1, //代表要展示
+	err = utils.DB.Table("chatmessage").Create(models.ChatMessage{
+		Content: user,
+		ChatId:  chatId,
+		Actor:   "user", //代表是用户
+		Show:    1,      //代表要展示
 
 	}).Error
 
 	//将API的回复写入数据库
-	err = utils.DB.Table("chatmessage").Create(chatMessage{
-		content: assistant,
-		chatId:  chatId,
-		actor:   2, //代表是用户
-		show:    1, //代表要展示
+	err = utils.DB.Table("chatmessage").Create(models.ChatMessage{
+		Content: assistant,
+		ChatId:  chatId,
+		Actor:   "assistant", //代表是回复
+		Show:    1,           //代表要展示
 
 	}).Error
 	if err != nil {
