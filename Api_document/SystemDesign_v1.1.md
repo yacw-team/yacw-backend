@@ -117,6 +117,7 @@ Req:
     modelId: string,+8
     content: {
         personalityId: string,//构造system
+        promptsId: string,
         user: string,      // user input
     }
 }
@@ -130,6 +131,7 @@ Res:
     modelId: string,
     content: {
         personalityId: string,
+        promptsId: string,
         user: string,      // user input
         assistant:string,
         title:string,
@@ -205,7 +207,7 @@ Res:
     chat:[
         {
             chatID:string,
-            title:string,
+            system:string,
         }
     ]
 }
