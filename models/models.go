@@ -1,11 +1,10 @@
 package models
 
 type ChatConversation struct {
-	Id           int
-	SystemPrompt string `gorm:"column:systemprompt"`
-	Uid          string `gorm:"column:uid"`
-	ModelId      int    `gorm:"column:modelid"`
-	PromptId     int    `gorm:"column:promptid"`
+	Id      int
+	Title   string `gorm:"column:title"`
+	Uid     string `gorm:"column:uid"`
+	ModelId int    `gorm:"column:modelid"`
 }
 
 type ChatMessage struct {
@@ -13,6 +12,7 @@ type ChatMessage struct {
 	Content string
 	ChatId  int `gorm:"column:chatid"`
 	Actor   int
+	Show    int
 }
 
 type Game struct {
@@ -40,12 +40,12 @@ type Literature struct {
 }
 
 type Personality struct {
-	Id        int
-	ModelName string `gorm:"column:modelname"`
-	Details   string
-	Prompt    string
-	Uid       string
-	Designer  int
+	Id              int
+	PersonalityName string `gorm:"column:personalityname"`
+	Description     string
+	Prompts         string
+	Uid             string
+	Designer        int
 }
 
 type PsychologyConversation struct {
@@ -63,14 +63,12 @@ type PsychologyMessage struct {
 }
 
 type Translation struct {
-	Id           int
-	Uid          string
-	OriginLang   string `gorm:"column:originlang"`
-	GoalLang     string `gorm:"column:goallang"`
-	EmotionId    int    `gorm:"column:emotionid"`
-	LiteratureId int    `gorm:"column:literatureid"`
-	Input        string
-	Output       string
+	Id         int
+	Uid        string
+	OriginLang string `gorm:"column:originlang"`
+	GoalLang   string `gorm:"column:goallang"`
+	Input      string
+	Output     string
 }
 
 type TranslationEmotion struct {
