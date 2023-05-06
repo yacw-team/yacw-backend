@@ -54,11 +54,11 @@ func SendChat(c *gin.Context) {
 		response.Id.UserMsgId = strconv.Itoa(max + 1)
 		userMessage.Content = request.Content.User
 		userMessage.ChatId = chatId
-		userMessage.Actor = 1
+		userMessage.Actor = "user"
 		utils.DB.Table("chatmessage").Create(&userMessage)
 		assistantMessage.Id = max + 2
 		assistantMessage.ChatId = chatId
-		assistantMessage.Actor = 2
+		assistantMessage.Actor = "assistant"
 		assistantResponse = ChattingWithGPT3Dot5Turbo(request.ApiKey, request.Content.User)
 		assistantMessage.Content = assistantResponse.Choices[0].Message.Content
 		response.Id.AssMsgId = strconv.Itoa(max + 2)

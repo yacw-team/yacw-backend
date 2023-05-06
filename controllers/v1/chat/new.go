@@ -81,16 +81,16 @@ func NewChat(c *gin.Context) {
 			systemMessage.Id = maxMessage + 1
 			systemMessage.Content = systemContent
 			systemMessage.ChatId = chatConversation.Id
-			systemMessage.Actor = 0
+			systemMessage.Actor = "system"
 			systemMessage.Show = 0
 			userMessage.Id = maxMessage + 2
 			userMessage.Content = request.Content.User
 			userMessage.ChatId = chatConversation.Id
-			userMessage.Actor = 1
+			userMessage.Actor = "user"
 			userMessage.Show = 1
 			assistantMessage.Id = maxMessage + 3
 			assistantMessage.ChatId = chatConversation.Id
-			assistantMessage.Actor = 2
+			assistantMessage.Actor = "assistant"
 			assistantMessage.Show = 1
 			//插入系统消息，用户消息，回答的消息
 			utils.DB.Table("chatmessage").Create(&systemMessage)

@@ -11,7 +11,7 @@ type ChatMessage struct {
 	Id      int
 	Content string
 	ChatId  int `gorm:"column:chatid"`
-	Actor   int
+	Actor   string
 	Show    int
 }
 
