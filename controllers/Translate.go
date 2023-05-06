@@ -36,12 +36,23 @@ func Translate(c *gin.Context) {
 
 	emotion := formData.Content.Emotion
 
+	if emotion == "" {
+		emotion = "normal"
+	}
+
 	style := formData.Content.Style
 
-	system := "You are a translator who can translate sentences with a given emotion and style."
-	prompt := "Please help me translate the following " + origin + "into " + goal + "using the " + emotion + " emotions and " + style + " style"
+	if style == "" {
+		style = "normal"
+	}
+
+	//设置翻译的身份
+	system := "You are a translator who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
+	prompt := "Translate this text into " + goal + " with a " + emotion + " tone: "
 	//翻译的语句
 	user := formData.Content.PreTranslate
+
+	prompt += user
 
 	req := openai.ChatCompletionRequest{
 		Model:     openai.GPT3Dot5Turbo,
@@ -53,11 +64,23 @@ func Translate(c *gin.Context) {
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: prompt,
+				Content: "Translate this text into English with a positive tone:我很高兴见到你。",
+			},
+			{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: "I am delighted to meet you.",
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: user,
+				Content: "Translate this text into English with a negative tone:我很高兴见到你。",
+			},
+			{
+				Role:    openai.ChatMessageRoleAssistant,
+				Content: "I guess it's nice to meet you.",
+			},
+			{
+				Role:    openai.ChatMessageRoleUser,
+				Content: prompt,
 			},
 		},
 	}
