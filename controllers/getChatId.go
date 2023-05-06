@@ -35,7 +35,6 @@ func GetChatId(c *gin.Context) {
 	if errRequireGetChatId == nil {
 		for ; i < len(chatConservation); i++ {
 			if requireGetChatId.ApiKey == chatConservation[i].Uid {
-				respondGetChatId.chat.System = chatConservation[i].SystemPrompt
 				id = chatConservation[i].Id
 			}
 		}

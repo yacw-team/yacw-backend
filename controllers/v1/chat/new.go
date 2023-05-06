@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
