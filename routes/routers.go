@@ -14,6 +14,8 @@ func SetupRouter() *gin.Engine {
 	r.GET("/v1/chat/prompts", controllers.GetPrompts)
 	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
+	r.POST("/v1/chat/getChat", controllers.GetChatId)
+	r.POST("/v1/chat/getMessage", controllers.GetChatMessage)
 	return r
 }
 
