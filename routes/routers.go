@@ -15,9 +15,10 @@ func SetupRouter() *gin.Engine {
 	r.GET("/v1/chat/myprompts", controllers.GetMyPrompt)
 	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
+	r.POST("/v1/chat/apiKey", controllers.VerifyApiKey)
 
 	r.POST("/v1/translate/translate", controllers.Translate)
-
+	r.POST("/v1/chat/chat", controllers.SendMessage)
 	return r
 }
 
@@ -29,3 +30,8 @@ func ApiPrefixMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+//// AuthMiddleware 中间件验证用户输入了API
+//func AuthMiddleware() gin.HandlerFunc {
+//
+//}
