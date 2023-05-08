@@ -2,7 +2,6 @@ package chat
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -35,18 +34,23 @@ type ResponseNewContent struct {
 	Title         string `json:"title"`
 }
 
+type ErrorCode struct {
+	ErrorStatus string `json:"error_status"`
+}
+
 // 新建对话API，路由/v1/chat/new
 func NewChat(c *gin.Context) {
 	var request NewChatRequest
 	var response NewChatResponse
 	var err = c.BindJSON(&request)
-	var errChange1, errPersonality error
+	var errPersonality error
 	var max, modelId int
 	var maxMessage, personalityId int
 	var chatConversation models.ChatConversation
 	var systemMessage, userMessage, assistantMessage models.ChatMessage
 	var systemContent string
 	var assistantResponse, title openai.ChatCompletionResponse
+	var gptError1, gptError2 error
 	//获取modelid，转int
 	if request.ModelId == "" {
 		modelId = 0
@@ -54,7 +58,9 @@ func NewChat(c *gin.Context) {
 		temp, errModelId := strconv.Atoi(request.ModelId)
 		modelId = temp
 		if errModelId != nil {
-			c.String(http.StatusInternalServerError, "转换失败")
+			var errorStatus ErrorCode
+			errorStatus.ErrorStatus = "1005"
+			c.JSON(http.StatusBadRequest, errorStatus)
 		}
 	}
 	if err == nil {
@@ -75,8 +81,10 @@ func NewChat(c *gin.Context) {
 			utils.DB.Table("personality").Where("id=?", personalityId).Find(&personality)
 			systemContent = personality.Prompts
 		}
-		if errChange1 != nil || errPersonality != nil {
-			c.JSON(http.StatusInternalServerError, "转换失败")
+		if errPersonality != nil {
+			var statusError ErrorCode
+			statusError.ErrorStatus = "1005"
+			c.JSON(http.StatusBadRequest, statusError)
 		} else {
 			systemMessage.Id = maxMessage + 1
 			systemMessage.Content = systemContent
@@ -95,31 +103,44 @@ func NewChat(c *gin.Context) {
 			//插入系统消息，用户消息，回答的消息
 			utils.DB.Table("chatmessage").Create(&systemMessage)
 			utils.DB.Table("chatmessage").Create(&userMessage)
-			assistantResponse = ChattingWithGPT(request.ApiKey, request.Content.User, systemContent, modelId)
-			assistantMessage.Content = assistantResponse.Choices[0].Message.Content
-			utils.DB.Table("chatmessage").Create(&assistantMessage)
-			titleString := request.Content.User + ";帮我给这句话取个不是病句、简洁的中文标题"
-			title = ChattingWithGPT(request.ApiKey, titleString, systemContent, modelId)
-			chatConversation.Title = title.Choices[0].Message.Content
-			//插入对话
-			utils.DB.Table("chatconversation").Create(&chatConversation)
-			//返回请求体
-			response.Content.Assistant = assistantResponse.Choices[0].Message.Content
-			response.Content.Title = title.Choices[0].Message.Content
-			response.Content.User = request.Content.User
-			response.Content.PersonalityId = request.Content.PersonalityId
-			response.ModelId = request.ModelId
-			response.ChatId = strconv.Itoa(max + 1)
-			c.JSON(http.StatusOK, response)
+			assistantResponse, gptError1 = ChattingWithGPT(request.ApiKey, request.Content.User, systemContent, modelId)
+			if gptError1 != nil {
+				var errorStatus ErrorCode
+				errorStatus.ErrorStatus = "3001"
+				c.JSON(http.StatusInternalServerError, errorStatus)
+			} else {
+				assistantMessage.Content = assistantResponse.Choices[0].Message.Content
+				utils.DB.Table("chatmessage").Create(&assistantMessage)
+				titleString := request.Content.User + ";帮我给这句话取个不是病句、简洁的中文标题"
+				title, gptError2 = ChattingWithGPT(request.ApiKey, titleString, systemContent, modelId)
+				if gptError2 != nil {
+					var errorStatus ErrorCode
+					errorStatus.ErrorStatus = "3001"
+					c.JSON(http.StatusInternalServerError, errorStatus)
+				} else {
+					chatConversation.Title = title.Choices[0].Message.Content
+					//插入对话
+					utils.DB.Table("chatconversation").Create(&chatConversation)
+					//返回请求体
+					response.Content.Assistant = assistantResponse.Choices[0].Message.Content
+					response.Content.Title = title.Choices[0].Message.Content
+					response.Content.User = request.Content.User
+					response.Content.PersonalityId = request.Content.PersonalityId
+					response.ModelId = request.ModelId
+					response.ChatId = strconv.Itoa(max + 1)
+					c.JSON(http.StatusOK, response)
+				}
+			}
 		}
-
 	} else {
-		c.String(http.StatusInternalServerError, "数据绑定失败")
+		var errorStatus ErrorCode
+		errorStatus.ErrorStatus = "1010"
+		c.JSON(http.StatusBadRequest, errorStatus)
 	}
 }
 
 // 调用chatgpt的函数参数有apikey，问题，人格，模型种类
-func ChattingWithGPT(apiKey string, question string, system string, modelId int) openai.ChatCompletionResponse {
+func ChattingWithGPT(apiKey string, question string, system string, modelId int) (openai.ChatCompletionResponse, error) {
 	client := openai.NewClient(apiKey)
 	var model string
 	if modelId == 0 {
@@ -144,7 +165,8 @@ func ChattingWithGPT(apiKey string, question string, system string, modelId int)
 		},
 	)
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
+		return resp, err
+	} else {
+		return resp, nil
 	}
-	return resp
 }
