@@ -10,6 +10,10 @@ import (
 // GetMyPrompt 获取我的prompt
 func GetMyPrompt(c *gin.Context) {
 	var prompts []models.Prompt
-	utils.DB.Table("prompt").Where("designer = ?", 1).Find(&prompts)
+	err := utils.DB.Table("prompt").Where("designer = ?", 1).Find(&prompts)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "数据库查询错误")
+		return
+	}
 	c.JSON(http.StatusOK, prompts)
 }
