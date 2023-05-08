@@ -11,11 +11,15 @@ import (
 func GetPromptShop(c *gin.Context) {
 	var prompts []models.Prompt
 	//获取类型
-	promptsType, err := c.GetQuery("type")
-	if err {
-		c.JSON(http.StatusBadRequest, err)
+	promptsType, has := c.GetQuery("type")
+	if !has {
+		c.JSON(http.StatusBadRequest, has)
 		return
 	}
-	utils.DB.Table("prompt").Where("designer = ? AND type = ?", 0, promptsType).Find(&prompts)
+	err := utils.DB.Table("prompt").Where("designer = ? AND type = ?", 0, promptsType).Find(&prompts).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, "数据库查询错误")
+		return
+	}
 	c.JSON(http.StatusOK, prompts)
 }
