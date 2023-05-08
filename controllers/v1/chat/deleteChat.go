@@ -23,7 +23,9 @@ func DeleteChat(c *gin.Context) {
 		if errChange == nil {
 			utils.DB.Table("chatconversation").Where("id=? and uid=?", id, uid).Find(&chatConversation)
 			if chatConversation.Uid == "" {
-				c.String(http.StatusBadRequest, "查无此对话")
+				var errorStatus ErrorCode
+				errorStatus.ErrorStatus = "1007"
+				c.JSON(http.StatusBadRequest, errorStatus)
 			} else {
 				var temp []models.ChatMessage
 				utils.DB.Table("chatmessage").Where("chatid=?", id).Find(&temp)
@@ -32,9 +34,13 @@ func DeleteChat(c *gin.Context) {
 				c.String(http.StatusOK, "200 OK")
 			}
 		} else {
-			c.String(http.StatusInternalServerError, "类型转换失败")
+			var errorStatus ErrorCode
+			errorStatus.ErrorStatus = "1005"
+			c.JSON(http.StatusBadRequest, errorStatus)
 		}
 	} else {
-		c.String(http.StatusInternalServerError, "数据绑定失败")
+		var errorStatus ErrorCode
+		errorStatus.ErrorStatus = "1010"
+		c.JSON(http.StatusBadRequest, errorStatus)
 	}
 }
