@@ -146,7 +146,15 @@ func ChattingWithGPT(apiKey string, question string, system string, modelId int)
 	if modelId == 0 {
 		model = openai.GPT3Dot5Turbo
 	} else if modelId == 1 {
+		model = openai.GPT3Dot5Turbo0301
+	} else if modelId == 2 {
+		model = openai.GPT4
+	} else if modelId == 3 {
+		model = openai.GPT432K
+	} else if modelId == 4 {
 		model = openai.GPT432K0314
+	} else if modelId == 5 {
+		model = openai.GPT40314
 	}
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
