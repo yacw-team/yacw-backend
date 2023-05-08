@@ -7,46 +7,34 @@ import (
 	"net/http"
 )
 
-// 绑定的结构体
-type formData struct {
-	APIKey  string `json:"apiKey"`
-	ModelId int    `json:"modelid"`
-	Content struct {
-		Emotion      string `json:"emotion"`
-		Style        string `json:"style"`
-		PreTranslate string `json:"preTranslate"`
-	} `json:"content"`
-	From string `json:"from"`
-	To   string `json:"to"`
-}
-
 // Translate 翻译
 func Translate(c *gin.Context) {
-	var formData formData
-	err := c.BindJSON(&formData)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据绑定错误")
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
+	if ok == false {
+		c.JSON(http.StatusInternalServerError, "上下文传递错误")
 		return
 	}
+	reqBody = reqTemp.(map[string]interface{})
 
 	// 创建 OpenAI 客户端
-	client := openai.NewClient(formData.APIKey)
+	client := openai.NewClient(reqBody["apiKey"].(string))
 	ctx := context.Background()
 
 	//原语言
-	origin := formData.From
+	origin := reqBody["from"].(string)
 	//目标语言
-	goal := formData.To
+	goal := reqBody["to"].(string)
 	//情感
-	emotion := formData.Content.Emotion
+	emotion := reqBody["content"].(map[string]interface{})["emotion"].(string)
 	//模型的id
-	modelId := formData.ModelId
+	modelId := int(reqBody["modelId"].(float64))
 
 	if emotion == "" {
 		emotion = "normal"
 	}
 
-	style := formData.Content.Style
+	style := reqBody["content"].(map[string]interface{})["style"].(string)
 
 	if style == "" {
 		style = "normal"
@@ -56,7 +44,7 @@ func Translate(c *gin.Context) {
 	system := "You are a translator who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
 	prompt := "Translate this text into " + goal + " with a " + emotion + " tone: "
 	//翻译的语句
-	user := formData.Content.PreTranslate
+	user := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
 
 	prompt += user
 

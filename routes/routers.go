@@ -44,15 +44,14 @@ func AuthMiddleware() gin.HandlerFunc {
 			})
 			return
 		}
-
-		// 访问 map 中的字段来获取 POST 请求的每个字段
+		//访问 map 中的字段来获取 POST 请求的每个字段
 		apiKey := reqBody["apiKey"].(string)
 
 		if apiKey == "" {
 			c.Redirect(http.StatusMovedPermanently, "/index?error=nokey")
 			return
 		}
-
+		c.Set("reqBody", reqBody)
 		c.Next()
 	}
 }
