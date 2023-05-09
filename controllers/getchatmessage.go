@@ -5,15 +5,16 @@ import (
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
+	"strconv"
 )
 
 type RequestGetMessage struct {
 	Apikey string `json:"apiKey"`
-	ChatId int    `json:"chatId"`
+	ChatId string `json:"chatId"`
 }
 
 type ResponseGetMessage struct {
-	ChatId   int       `gorm:"column:chatid" json:"chatId"`
+	ChatId   string    `gorm:"column:chatid" json:"chatId"`
 	Messages []Message `json:"messages"`
 }
 
@@ -31,9 +32,9 @@ func GetChatMessage(c *gin.Context) {
 	if errRequestGetMessage == nil {
 		if err := utils.DB.Table("chatmessage").Where("chatid = ?", requestGetMessage.ChatId).Order("id ASC").Find(&chatMessages).Error; err == nil {
 			if len(chatMessages) > 0 {
-				responseGetMessage.ChatId = chatMessages[0].ChatId
+				responseGetMessage.ChatId = strconv.Itoa(chatMessages[0].ChatId)
 				for ; i < len(chatMessages); i++ {
-					if chatMessages[i].Show == 0 {
+					if chatMessages[i].Show == 1 {
 						responseGetMessage.Messages = append(responseGetMessage.Messages, Message{
 							Type:    chatMessages[i].Actor,
 							Content: chatMessages[i].Content,
