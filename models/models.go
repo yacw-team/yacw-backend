@@ -8,6 +8,12 @@ type Prompt struct {
 	Uid         string `json:"-"`
 	Designer    int64  `json:"-"`
 }
+type ChatConversation struct {
+	Id      int
+	Title   string `gorm:"column:title"`
+	Uid     string `gorm:"column:uid"`
+	ModelId int    `gorm:"column:modelid"`
+}
 
 type ChatMessage struct {
 	Id      int
@@ -15,4 +21,13 @@ type ChatMessage struct {
 	ChatId  int `gorm:"column:chatid"`
 	Actor   string
 	Show    int
+}
+
+type Personality struct {
+	Id          int    `json:"id"`
+	ModelName   string `gorm:"column:personalityname" json:"name"`
+	Description string `json:"description"`
+	Prompts     string `json:"prompts"`
+	Uid         string `json:"-"`
+	Designer    string `json:"-"`
 }

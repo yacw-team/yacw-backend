@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -12,33 +13,25 @@ import (
 
 var model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k", "gpt-4-32K-0314", "gpt-4-0314"}
 
-// 接受json的格式
-type reqMessage struct {
-	ApiKey  string `json:"apiKey"`
-	ChatId  string `json:"chatId"`
-	Content struct {
-		User string `json:"user"`
-	}
-}
-
 // SendMessage 发送对话
 func SendMessage(c *gin.Context) {
-	var reqMessage reqMessage
-	err := c.BindJSON(reqMessage)
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据绑定错误")
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
+	if ok == false {
+		c.JSON(http.StatusInternalServerError, "上下文传递错误")
 		return
 	}
+	reqBody = reqTemp.(map[string]interface{})
 
 	//获取数据
-	apiKey := reqMessage.ApiKey
-	chatId, err := strconv.Atoi(reqMessage.ChatId)
+	apiKey := reqBody["apiKey"].(string)
+	chatId, err := strconv.Atoi(reqBody["chatId"].(string))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "字符串转数字出错")
+		c.JSON(http.StatusInternalServerError, "类型转换错误")
 		return
 	}
-	user := reqMessage.Content.User
+
+	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(apiKey)
@@ -75,11 +68,12 @@ func SendMessage(c *gin.Context) {
 		},
 	}, message...)
 
+	fmt.Println(message)
+
 	//构造请求体
 	req := openai.ChatCompletionRequest{
-		Model:     model[modelId],
-		MaxTokens: 100,
-		Messages:  message,
+		Model:    model[modelId],
+		Messages: message,
 	}
 
 	resp, err := client.CreateChatCompletion(ctx, req)
@@ -91,7 +85,7 @@ func SendMessage(c *gin.Context) {
 	assistant := resp.Choices[0].Message.Content
 
 	//将用户的对话写入数据库
-	err = utils.DB.Table("chatmessage").Create(models.ChatMessage{
+	err = utils.DB.Table("chatmessage").Create(&models.ChatMessage{
 		Content: user,
 		ChatId:  chatId,
 		Actor:   "user", //代表是用户
@@ -100,7 +94,7 @@ func SendMessage(c *gin.Context) {
 	}).Error
 
 	//将API的回复写入数据库
-	err = utils.DB.Table("chatmessage").Create(models.ChatMessage{
+	err = utils.DB.Table("chatmessage").Create(&models.ChatMessage{
 		Content: assistant,
 		ChatId:  chatId,
 		Actor:   "assistant", //代表是回复
@@ -114,7 +108,7 @@ func SendMessage(c *gin.Context) {
 
 	//将用户的对话和API的回复存入数据库
 	c.JSON(http.StatusOK, gin.H{
-		"chatId": chatId,
+		"chatId": strconv.Itoa(chatId),
 		"content": gin.H{
 			"user":      user,
 			"assistant": assistant,
@@ -124,7 +118,7 @@ func SendMessage(c *gin.Context) {
 
 // 包装历史信息
 func getMessage(history []string) []openai.ChatCompletionMessage {
-	var message []openai.ChatCompletionMessage
+	message := make([]openai.ChatCompletionMessage, 0)
 	var begin int
 
 	if len(history) < 10 {
@@ -135,14 +129,16 @@ func getMessage(history []string) []openai.ChatCompletionMessage {
 
 	//包含历史的后10条对话，一问一答
 	for i := begin; i < len(history); i++ {
+		var newMessage openai.ChatCompletionMessage
 		//偶数是用户的,奇数是AI回复
 		if i%2 == 0 {
-			message[i].Role = openai.ChatMessageRoleUser
-			message[i].Content = history[i]
+			newMessage.Role = openai.ChatMessageRoleUser
+			newMessage.Content = history[i]
 		} else {
-			message[i].Role = openai.ChatMessageRoleAssistant
-			message[i].Content = history[i]
+			newMessage.Role = openai.ChatMessageRoleAssistant
+			newMessage.Content = history[i]
 		}
+		message = append(message, newMessage)
 	}
 	return message
 }
