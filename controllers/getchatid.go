@@ -27,19 +27,24 @@ func GetChatId(c *gin.Context) {
 	var chatConservations []models.ChatConversation
 	var chatTemps []Chat
 	var i = 0
-	Uid := utils.EncryptPassword(requestGetChatId.ApiKey)
-	if errRequestGetChatId == nil {
-		if err := utils.DB.Table("chatconversation").Where("uid=?", Uid).Find(&chatConservations).Error; err == nil {
-			if len(chatConservations) > 0 {
-				for ; i < len(chatConservations); i++ {
-					var temp Chat
-					temp.Title = chatConservations[i].Title
-					temp.ChatId = chatConservations[i].Id
-					chatTemps = append(chatTemps, temp)
+	apiKeyTest := utils.ApiKeyCheck(requestGetChatId.ApiKey)
+	if apiKeyTest == true {
+		Uid := utils.EncryptPassword(requestGetChatId.ApiKey)
+		if errRequestGetChatId == nil {
+			if err := utils.DB.Table("chatconversation").Where("uid=?", Uid).Find(&chatConservations).Error; err == nil {
+				if len(chatConservations) > 0 {
+					for ; i < len(chatConservations); i++ {
+						var temp Chat
+						temp.Title = chatConservations[i].Title
+						temp.ChatId = chatConservations[i].Id
+						chatTemps = append(chatTemps, temp)
+					}
 				}
 			}
 		}
+		responseGetChatId.Chat = chatTemps
+		c.JSON(http.StatusOK, responseGetChatId)
+	} else {
+		c.JSON(http.StatusBadRequest, "3004")
 	}
-	responseGetChatId.Chat = chatTemps
-	c.JSON(http.StatusOK, responseGetChatId)
 }
