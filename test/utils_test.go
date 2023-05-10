@@ -22,7 +22,7 @@ func TestEncryptPassword(t *testing.T) {
 }
 
 func TestDeleteChat(t *testing.T) {
-	utils.InitDB()
+	utils.InitDBTest()
 	r := routes.SetupRouter()
 	utils.DB.Table("chatconversation").Create(&models.ChatConversation{Id: 1, Title: "123", Uid: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", ModelId: 0})
 	utils.DB.Table("chatmessage").Create(&models.ChatMessage{Id: 1, Content: "123", ChatId: 1, Actor: "user", Show: 1})
