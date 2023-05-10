@@ -4,28 +4,40 @@ type ErrCode struct {
 	ErrCode string `json:"errCode"`
 }
 
+type Prompt struct {
+	Id            int    `json:"id"`
+	ModelName     string `gorm:"column:modelname" json:"name"`
+	Description   string `json:"description"`
+	Details       string `json:"details"`
+	ExampleInput  string `gorm:"column:exampleinput" json:"exampleInput"`
+	ExampleOutput string `gorm:"column:exampleoutput" json:"exampleOutput"`
+	Prompts       string `json:"content"`
+	Uid           string `json:"-"`
+	Designer      string `json:"-"`
+}
+
 type ChatConversation struct {
-	Id      int
-	Uid     string
-	ModelId int
-	Title   string
+	Id      int    `json:"id"`
+	Uid     string `json:"uid"`
+	ModelId int    `gorm:"column:modelid"`
+	Title   string `json:"title"`
 }
 
 type ChatMessage struct {
-	Id      int
-	Content string
-	ChatId  int `gorm:"column:chatid"`
-	Actor   string
-	Show    int
+	Id      int    `json:"id"`
+	Content string `json:"content"`
+	ChatId  int    `gorm:"column:chatid"`
+	Actor   string `json:"actor"`
+	Show    int    `json:"show"`
 }
 
 type Game struct {
-	Id           int
-	Uid          string
-	Background   string
-	Protagonist  string
-	Goal         string
-	SystemPrompt string
+	Id           int    `json:"id"`
+	Uid          string `json:"uid"`
+	Background   string `json:"background"`
+	Protagonist  string `json:"protagonist"`
+	Goal         string `json:"goal"`
+	SystemPrompt string `gorm:"column:systemprompt" json:"systemPrompt"`
 }
 
 type GameMessage struct {
@@ -44,12 +56,12 @@ type Literature struct {
 }
 
 type Personality struct {
-	Id        int
-	ModelName string
-	Details   string
-	Prompt    string
-	Uid       string
-	Designer  int
+	Id          int    `json:"id"`
+	ModelName   string `gorm:"column:personalityname" json:"name"`
+	Description string `json:"description"`
+	Prompts     string `json:"prompts"`
+	Uid         string `json:"-"`
+	Designer    string `json:"-"`
 }
 
 type PsychologyConversation struct {
