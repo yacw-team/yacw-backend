@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
+	"github.com/yacw-team/yacw/utils"
 	"net/http"
 	"strconv"
 )
@@ -18,6 +19,14 @@ func Translate(c *gin.Context) {
 		return
 	}
 	reqBody = reqTemp.(map[string]interface{})
+
+	apiKeyCheck := utils.IsValidApiKey(reqBody["apiKey"].(string))
+	if apiKeyCheck == false {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
 
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(reqBody["apiKey"].(string))

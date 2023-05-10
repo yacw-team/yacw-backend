@@ -27,23 +27,29 @@ func GetChatMessage(c *gin.Context) {
 	var responseGetMessage ResponseGetMessage
 	var errRequestGetMessage = c.ShouldBindJSON(&requestGetMessage)
 	var chatMessages []models.ChatMessage
+	apiKeyCheck := utils.IsValidApiKey(requestGetMessage.Apikey)
+	if apiKeyCheck {
+		if errRequestGetMessage == nil {
+			if err := utils.DB.Table("chatmessage").Where("chatid = ? AND show = ?", requestGetMessage.ChatId, 1).Order("id ASC").Find(&chatMessages).Error; err == nil {
+				if len(chatMessages) > 0 {
+					responseGetMessage.ChatId = chatMessages[0].ChatId
+					for i := 0; i < len(chatMessages); i++ {
+						responseGetMessage.Messages = append(responseGetMessage.Messages, Message{
+							Type:    chatMessages[i].Actor,
+							Content: chatMessages[i].Content,
+						})
 
-	if errRequestGetMessage == nil {
-		if err := utils.DB.Table("chatmessage").Where("chatid = ? AND show = ?", requestGetMessage.ChatId, 1).Order("id ASC").Find(&chatMessages).Error; err == nil {
-			if len(chatMessages) > 0 {
-				responseGetMessage.ChatId = chatMessages[0].ChatId
-				for i := 0; i < len(chatMessages); i++ {
-					responseGetMessage.Messages = append(responseGetMessage.Messages, Message{
-						Type:    chatMessages[i].Actor,
-						Content: chatMessages[i].Content,
-					})
-
+					}
 				}
+			} else {
+				c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+				return
 			}
-		} else {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-			return
 		}
+		c.JSON(http.StatusOK, responseGetMessage)
+	} else {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
 	}
-	c.JSON(http.StatusOK, responseGetMessage)
 }

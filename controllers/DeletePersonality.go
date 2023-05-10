@@ -7,30 +7,33 @@ import (
 	"net/http"
 )
 
-type deletePersonalityReqBody struct {
-	apikey        string
-	personalityId string
-}
-
 // DeletePersonality 删除用户创建的Personality
 func DeletePersonality(c *gin.Context) {
 
 	var reqBody deletePromptReqBody
-	err := c.BindJSON(reqBody)
+	err := c.BindJSON(&reqBody)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1010"})
 		return
 	}
+	apiKeyCheck := utils.IsValidApiKey(reqBody.ApiKey)
+	if apiKeyCheck {
+		if apiKeyCheck {
+			uid := utils.Encrypt(reqBody.ApiKey) //用户id
 
-	uid := utils.Encrypt(reqBody.apiKey) //用户id
+			id := reqBody.PromptsId
 
-	id := reqBody.promptsId
-
-	err = utils.DB.Table("personality").Where("id = ? AND uid = ?", id, uid).Delete(models.Personality{}).Error
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
-		return
+			err = utils.DB.Table("personality").Where("id = ? AND uid = ?", id, uid).Delete(models.Personality{}).Error
+			if err != nil {
+				c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
+				return
+			}
+			c.JSON(http.StatusOK, models.ErrCode{ErrCode: "0000"})
+		}
+	} else {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
 	}
-	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "0000"})
 }

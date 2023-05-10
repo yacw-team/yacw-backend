@@ -67,6 +67,14 @@ func NewChat(c *gin.Context) {
 	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
 	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
+	apiKeyCheck := utils.IsValidApiKey(apiKey)
+	if apiKeyCheck == false {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
+
 	uid := utils.Encrypt(apiKey)
 	//获取最大的对话id
 	err = utils.DB.Table("chatconversation").Select("COALESCE(MAX(id), 0)").Row().Scan(&max)

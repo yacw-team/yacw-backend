@@ -8,8 +8,8 @@ import (
 )
 
 type deletePromptReqBody struct {
-	apiKey    string
-	promptsId string
+	ApiKey    string `json:"apiKey"`
+	PromptsId string `json:"promptsId"`
 }
 
 // DeletePrompt 删除用户创建的prompt
@@ -22,8 +22,16 @@ func DeletePrompt(c *gin.Context) {
 		return
 	}
 
-	uid := utils.Encrypt(reqBody.apiKey) //用户id
-	id := reqBody.promptsId
+	apiKeyCheck := utils.IsValidApiKey(reqBody.ApiKey)
+	if apiKeyCheck == false {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
+
+	uid := utils.Encrypt(reqBody.ApiKey) //用户id
+	id := reqBody.PromptsId
 
 	err = utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error
 	if err != nil {

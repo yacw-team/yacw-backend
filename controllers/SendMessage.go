@@ -25,6 +25,15 @@ func SendMessage(c *gin.Context) {
 
 	//获取数据
 	apiKey := reqBody["apiKey"].(string)
+
+	apiKeyCheck := utils.IsValidApiKey(apiKey)
+	if apiKeyCheck == false {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
+
 	chatId, err := strconv.Atoi(reqBody["chatId"].(string))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
