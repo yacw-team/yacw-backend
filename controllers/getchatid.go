@@ -27,8 +27,8 @@ func GetChatId(c *gin.Context) {
 	var chatConservations []models.ChatConversation
 	var chatTemps []Chat
 	var i = 0
-	apiKeyTest := utils.ApiKeyCheck(requestGetChatId.ApiKey)
-	if apiKeyTest == true {
+	apiKeyCheck := utils.ApiKeyCheck(requestGetChatId.ApiKey)
+	if apiKeyCheck {
 		Uid := utils.EncryptPassword(requestGetChatId.ApiKey)
 		if errRequestGetChatId == nil {
 			if err := utils.DB.Table("chatconversation").Where("uid=?", Uid).Find(&chatConservations).Error; err == nil {
@@ -45,6 +45,8 @@ func GetChatId(c *gin.Context) {
 		responseGetChatId.Chat = chatTemps
 		c.JSON(http.StatusOK, responseGetChatId)
 	} else {
-		c.JSON(http.StatusBadRequest, "3004")
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
 	}
 }

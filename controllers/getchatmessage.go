@@ -30,7 +30,7 @@ func GetChatMessage(c *gin.Context) {
 	var chatMessages []models.ChatMessage
 	i := 0
 	apiKeyCheck := utils.ApiKeyCheck(requestGetMessage.Apikey)
-	if apiKeyCheck == true {
+	if apiKeyCheck {
 		if errRequestGetMessage == nil {
 			if err := utils.DB.Table("chatmessage").Where("chatid = ?", requestGetMessage.ChatId).Order("id ASC").Find(&chatMessages).Error; err == nil {
 				if len(chatMessages) > 0 {
@@ -48,6 +48,8 @@ func GetChatMessage(c *gin.Context) {
 		}
 		c.JSON(http.StatusOK, responseGetMessage)
 	} else {
-		c.JSON(http.StatusBadRequest, "3004")
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
 	}
 }
