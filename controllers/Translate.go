@@ -6,6 +6,7 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
 	"net/http"
+	"strconv"
 )
 
 // Translate 翻译
@@ -29,7 +30,12 @@ func Translate(c *gin.Context) {
 	//情感
 	emotion := reqBody["content"].(map[string]interface{})["emotion"].(string)
 	//模型的id
-	modelId := int(reqBody["modelId"].(float64))
+	modelId, err := strconv.Atoi(reqBody["modelId"].(string))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
+		return
+	}
 
 	if emotion == "" {
 		emotion = "normal"
