@@ -1,5 +1,9 @@
 package models
 
+type ErrCode struct {
+	ErrCode string `json:"errCode"`
+}
+
 type ChatConversation struct {
 	Id      int
 	Uid     string
