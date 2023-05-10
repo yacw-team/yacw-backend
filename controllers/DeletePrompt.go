@@ -18,7 +18,7 @@ func DeletePrompt(c *gin.Context) {
 	err := c.Bind(&reqBody)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据绑定失败")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1010"})
 		return
 	}
 
@@ -27,8 +27,8 @@ func DeletePrompt(c *gin.Context) {
 
 	err = utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "NO")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "0000"})
 }

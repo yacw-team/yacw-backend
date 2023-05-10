@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/yacw-team/yacw/models"
 	"net/http"
 )
 
@@ -29,9 +30,9 @@ func VerifyApiKey(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusUnauthorized, "Unauthorized")
+		c.JSON(http.StatusUnauthorized, models.ErrCode{ErrCode: "1002"})
 		return
 	}
 
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "1002"})
 }

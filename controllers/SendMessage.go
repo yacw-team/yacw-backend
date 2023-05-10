@@ -18,7 +18,7 @@ func SendMessage(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if ok == false {
-		c.JSON(http.StatusInternalServerError, "上下文传递错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
 	reqBody = reqTemp.(map[string]interface{})
@@ -27,7 +27,7 @@ func SendMessage(c *gin.Context) {
 	apiKey := reqBody["apiKey"].(string)
 	chatId, err := strconv.Atoi(reqBody["chatId"].(string))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "类型转换错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
 
@@ -40,17 +40,25 @@ func SendMessage(c *gin.Context) {
 	//查找第一句system
 	var systemMessage models.ChatMessage
 	err = utils.DB.Table("chatmessage").Where("chatid = ? AND actor = ?", chatId, "system").Find(&systemMessage).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
 
 	//查找modelId
 	var modelId int
 	err = utils.DB.Table("chatconversation").Where("id = ?", chatId).Select("modelid").Scan(&modelId).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
 
 	//查找历史的对话
 	var history []string
 	err = utils.DB.Table("chatmessage").Where("chatId = ? AND (actor = ? OR actor = ?)", chatId, "user", "assistant").Select("content").Scan(&history).Error
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据库查询错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 
@@ -92,6 +100,10 @@ func SendMessage(c *gin.Context) {
 		Show:    1,      //代表要展示
 
 	}).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
 
 	//将API的回复写入数据库
 	err = utils.DB.Table("chatmessage").Create(&models.ChatMessage{
@@ -102,7 +114,7 @@ func SendMessage(c *gin.Context) {
 
 	}).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据库存储失败")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 

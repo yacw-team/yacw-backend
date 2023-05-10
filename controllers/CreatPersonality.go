@@ -16,11 +16,13 @@ func CreatePersonality(c *gin.Context) {
 	prompts := c.PostForm("prompts")
 
 	if len(strings.TrimSpace(modelName)) == 0 {
-		c.JSON(http.StatusBadRequest, "名称不能为空")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1007"})
+		return
 	}
 
 	if len(strings.TrimSpace(prompts)) == 0 {
-		c.JSON(http.StatusBadRequest, "prompts不能为空")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1007"})
+		return
 	}
 
 	personality := models.Personality{
@@ -32,7 +34,7 @@ func CreatePersonality(c *gin.Context) {
 
 	err := utils.DB.Table("personality").Create(&personality).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "NO")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

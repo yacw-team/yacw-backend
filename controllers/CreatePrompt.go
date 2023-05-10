@@ -16,11 +16,13 @@ func CreatePrompt(c *gin.Context) {
 	prompts := c.PostForm("prompts")
 
 	if len(strings.TrimSpace(modelName)) == 0 {
-		c.JSON(http.StatusBadRequest, "名称不能为空")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1007"})
+		return
 	}
 
 	if len(strings.TrimSpace(prompts)) == 0 {
-		c.JSON(http.StatusBadRequest, "prompt不能为空")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1007"})
+		return
 	}
 
 	prompt := models.Prompt{
@@ -33,7 +35,7 @@ func CreatePrompt(c *gin.Context) {
 
 	err := utils.DB.Table("prompt").Create(&prompt).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "数据库读写出错")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{

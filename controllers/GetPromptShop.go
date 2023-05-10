@@ -18,7 +18,7 @@ func GetPromptShop(c *gin.Context) {
 	}
 	err := utils.DB.Table("prompt").Where("designer = ? AND type = ?", 0, promptsType).Find(&prompts).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据库查询错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 	c.JSON(http.StatusOK, prompts)

@@ -40,6 +40,9 @@ func GetChatMessage(c *gin.Context) {
 
 				}
 			}
+		} else {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+			return
 		}
 	}
 	c.JSON(http.StatusOK, responseGetMessage)

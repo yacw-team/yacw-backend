@@ -19,7 +19,7 @@ func DeletePersonality(c *gin.Context) {
 	err := c.BindJSON(reqBody)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "数据绑定错误")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1010"})
 		return
 	}
 
@@ -29,8 +29,8 @@ func DeletePersonality(c *gin.Context) {
 
 	err = utils.DB.Table("personality").Where("id = ? AND uid = ?", id, uid).Delete(models.Personality{}).Error
 	if err != nil {
-		c.JSON(http.StatusBadRequest, "NO")
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
 		return
 	}
-	c.JSON(http.StatusOK, "OK")
+	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "0000"})
 }

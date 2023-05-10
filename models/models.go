@@ -1,5 +1,9 @@
 package models
 
+type ErrCode struct {
+	ErrCode string `json:"errCode"`
+}
+
 type Prompt struct {
 	Id          int    `json:"id"`
 	PromptName  string `gorm:"column:promptname" json:"name"`

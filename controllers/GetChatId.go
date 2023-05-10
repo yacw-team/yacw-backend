@@ -38,6 +38,9 @@ func GetChatId(c *gin.Context) {
 					chatTemps = append(chatTemps, temp)
 				}
 			}
+		} else {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+			return
 		}
 	}
 	responseGetChatId.Chat = chatTemps

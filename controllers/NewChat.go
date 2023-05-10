@@ -52,7 +52,7 @@ func NewChat(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if ok == false {
-		c.JSON(http.StatusInternalServerError, "上下文传递错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
 	reqBody = reqTemp.(map[string]interface{})
@@ -61,7 +61,7 @@ func NewChat(c *gin.Context) {
 	modelStr := reqBody["modelId"].(string)
 	modelId, err := strconv.Atoi(modelStr)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, "类型转换错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
 	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
@@ -107,16 +107,29 @@ func NewChat(c *gin.Context) {
 	//插入系统消息，用户消息，回答的消息
 	utils.DB.Table("chatmessage").Create(&systemMessage)
 	utils.DB.Table("chatmessage").Create(&userMessage)
-	assistantResponse, _ = ChattingWithGPT(apiKey, user, systemContent, modelId)
+	assistantResponse, err = ChattingWithGPT(apiKey, user, systemContent, modelId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		return
+	}
 
 	assistantMessage.Content = assistantResponse.Choices[0].Message.Content
 	utils.DB.Table("chatmessage").Create(&assistantMessage)
 	titleString := "帮我根据以下的文本想一个标题（注意直接返回一个标题，我想直接使用，正式一些）：" + user
-	title, _ = ChattingWithGPT(apiKey, titleString, systemContent, modelId)
+	title, err = ChattingWithGPT(apiKey, titleString, systemContent, modelId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		return
+	}
 
 	chatConversation.Title = title.Choices[0].Message.Content
 	//插入对话
-	utils.DB.Table("chatconversation").Create(&chatConversation)
+	err = utils.DB.Table("chatconversation").Create(&chatConversation).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
 	//返回请求体
 	response.Content.Assistant = assistantResponse.Choices[0].Message.Content
 	response.Content.Title = title.Choices[0].Message.Content

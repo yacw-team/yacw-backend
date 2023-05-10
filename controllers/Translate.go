@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/yacw-team/yacw/models"
 	"net/http"
 )
 
@@ -12,7 +13,7 @@ func Translate(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if ok == false {
-		c.JSON(http.StatusInternalServerError, "上下文传递错误")
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
 	reqBody = reqTemp.(map[string]interface{})
@@ -81,7 +82,7 @@ func Translate(c *gin.Context) {
 
 	resp, err := client.CreateChatCompletion(ctx, req)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
 		return
 	}
 
