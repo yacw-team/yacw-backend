@@ -22,7 +22,7 @@ func TestDeleteChat(t *testing.T) {
 	json, err := json2.Marshal(&temp)
 	reader := bytes.NewReader(json)
 	if err == nil {
-		req, _ := http.NewRequest("DELETE", "/v1/chat/chat", reader)
+		req, _ := http.NewRequest("DELETE", "/api/v1/chat/chat", reader)
 		resp := httptest.NewRecorder()
 		r.ServeHTTP(resp, req)
 
