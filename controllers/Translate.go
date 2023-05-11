@@ -57,6 +57,11 @@ func Translate(c *gin.Context) {
 		return
 	}
 
+	if modelId < 0 || modelId > 6 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
+		return
+	}
+
 	if emotion == "" {
 		emotion = "normal"
 	}
