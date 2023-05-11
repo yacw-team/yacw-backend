@@ -61,3 +61,16 @@ func TestGetChatMessageFormatMixing(t *testing.T) {
 	expected := `{"errCode":"3004"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestGetChatMessageApiKeyNull(t *testing.T) {
+	utils.InitDBTest()
+	var jsonStr = []byte(`{"apiKey":"","chatId":"1"}`)
+	req, err := http.NewRequest("POST", "/v1/chat/getMessage", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3004"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
