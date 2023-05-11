@@ -155,7 +155,7 @@ func TestTranslateModelIdCross(t *testing.T) {
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestTranslate := &RequestTranslate{
 		ApiKey:  apiKey,
-		ModelId: "",
+		ModelId: "11",
 		Content: TranslateContent{
 			Emotion:      "happy",
 			Style:        "",
