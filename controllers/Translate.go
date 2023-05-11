@@ -39,7 +39,18 @@ func Translate(c *gin.Context) {
 	//情感
 	emotion := reqBody["content"].(map[string]interface{})["emotion"].(string)
 	//模型的id
-	modelId, err := strconv.Atoi(reqBody["modelId"].(string))
+	modelStr := reqBody["modelId"].(string)
+	//文体
+	style := reqBody["content"].(map[string]interface{})["style"].(string)
+
+	slice := []string{origin, goal, emotion, modelStr, style}
+
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
+
+	modelId, err := strconv.Atoi(modelStr)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
@@ -49,8 +60,6 @@ func Translate(c *gin.Context) {
 	if emotion == "" {
 		emotion = "normal"
 	}
-
-	style := reqBody["content"].(map[string]interface{})["style"].(string)
 
 	if style == "" {
 		style = "normal"

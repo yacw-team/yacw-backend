@@ -10,12 +10,6 @@ import (
 	"strconv"
 )
 
-type NewChatRequest struct {
-	ApiKey  string
-	ModelId string
-	Content Content
-}
-
 type NewChatResponse struct {
 	ChatId  string             `json:"chatId"`
 	ModelId string             `json:"modelId"`
@@ -32,10 +26,6 @@ type ResponseNewContent struct {
 	User          string `json:"user"`
 	Assistant     string `json:"assistant"`
 	Title         string `json:"title"`
-}
-
-type ErrorCode struct {
-	ErrorStatus string `json:"error_status"`
 }
 
 // NewChat 新建对话API，路由/v1/chat/new
@@ -59,13 +49,20 @@ func NewChat(c *gin.Context) {
 
 	apiKey := reqBody["apiKey"].(string)
 	modelStr := reqBody["modelId"].(string)
+	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
+	user := reqBody["content"].(map[string]interface{})["user"].(string)
+
+	slice := []string{apiKey, modelStr, personalityId, user}
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
+
 	modelId, err := strconv.Atoi(modelStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
-	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
-	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if apiKeyCheck == false {
@@ -75,7 +72,11 @@ func NewChat(c *gin.Context) {
 		return
 	}
 
-	uid := utils.Encrypt(apiKey)
+	uid, err := utils.Encrypt(apiKey)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
+		return
+	}
 	//获取最大的对话id
 	err = utils.DB.Table("chatconversation").Select("COALESCE(MAX(id), 0)").Row().Scan(&max)
 	if err != nil {
@@ -94,7 +95,11 @@ func NewChat(c *gin.Context) {
 		systemContent = "You are a helper."
 	} else {
 		var personality models.Personality
-		utils.DB.Table("personality").Where("id=?", personalityId).Find(&personality)
+		err = utils.DB.Table("personality").Where("id=?", personalityId).Find(&personality).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+			return
+		}
 		systemContent = personality.Prompts
 	}
 
@@ -113,8 +118,16 @@ func NewChat(c *gin.Context) {
 	assistantMessage.Actor = "assistant"
 	assistantMessage.Show = 1
 	//插入系统消息，用户消息，回答的消息
-	utils.DB.Table("chatmessage").Create(&systemMessage)
-	utils.DB.Table("chatmessage").Create(&userMessage)
+	err = utils.DB.Table("chatmessage").Create(&systemMessage).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
+	err = utils.DB.Table("chatmessage").Create(&userMessage).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		return
+	}
 	assistantResponse, err = ChattingWithGPT(apiKey, user, systemContent, modelId)
 
 	if err != nil {
