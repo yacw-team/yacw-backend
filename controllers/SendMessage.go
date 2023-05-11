@@ -101,7 +101,7 @@ func SendMessage(c *gin.Context) {
 
 	resp, err := client.CreateChatCompletion(ctx, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3007"})
 		return
 	}
 	//获取回复
