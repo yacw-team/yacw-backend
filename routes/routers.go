@@ -13,12 +13,12 @@ func SetupRouter() *gin.Engine {
 	//添加中间件
 	r.Use(ApiPrefixMiddleware())
 	r.GET("/v1/chat/prompts", controllers.GetPromptShop)
-	r.GET("/v1/chat/myprompts", controllers.GetMyPrompt)
+	r.POST("/v1/chat/myprompts", AuthMiddleware(), controllers.GetMyPrompt)
 	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
 	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
 	r.POST("/v1/chat/apiKey", controllers.VerifyApiKey)
 	r.GET("/v1/chat/personality", controllers.GetPersonalityShop)
-	r.GET("/v1/chat/mypersonality", controllers.GetMyPersonality)
+	r.POST("/v1/chat/mypersonality", AuthMiddleware(), controllers.GetMyPersonality)
 	r.POST("/v1/chat/personality", controllers.CreatePersonality)
 	r.DELETE("/v1/chat/personality", controllers.DeletePersonality)
 

@@ -25,6 +25,14 @@ func SendMessage(c *gin.Context) {
 
 	//获取数据
 	apiKey := reqBody["apiKey"].(string)
+	user := reqBody["content"].(map[string]interface{})["user"].(string)
+	chatStr := reqBody["chatId"].(string)
+
+	slice := []string{apiKey, user, chatStr}
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if apiKeyCheck == false {
@@ -34,13 +42,11 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	chatId, err := strconv.Atoi(reqBody["chatId"].(string))
+	chatId, err := strconv.Atoi(chatStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
-
-	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(apiKey)

@@ -16,12 +16,22 @@ type deleteChatReqBody struct {
 func DeleteChat(c *gin.Context) {
 	var request deleteChatReqBody
 	var err = c.BindJSON(&request)
+
+	slice := []string{request.ApiKey, request.ChatId}
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
 	var chatConversation models.ChatConversation
 	apiKeyCheck := utils.IsValidApiKey(request.ApiKey)
 	if apiKeyCheck {
 		if err == nil {
 			id, errChange := strconv.Atoi(request.ChatId)
-			uid := utils.Encrypt(request.ApiKey)
+			uid, err := utils.Encrypt(request.ApiKey)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
+				return
+			}
 			if errChange == nil {
 				utils.DB.Table("chatconversation").Where("id=? and uid=?", id, uid).Find(&chatConversation)
 				if chatConversation.Uid == "" {

@@ -3,6 +3,7 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"errors"
 	"flag"
 	"os"
 )
@@ -11,9 +12,13 @@ import (
 const hashLength = 16
 
 // Encrypt 对apikey进行加盐 哈希 截断
-func Encrypt(input string) string {
+func Encrypt(input string) (string, error) {
 
-	salt := getSalt()
+	salt, err := getSalt()
+
+	if err != nil {
+		return "", errors.New(err.Error())
+	}
 
 	// 将盐和输入字符串拼接起来
 	saltedInput := input + salt
@@ -29,18 +34,21 @@ func Encrypt(input string) string {
 	encodedHash := base64.StdEncoding.EncodeToString(truncatedHash)
 	result := encodedSalt + encodedHash
 
-	return result
+	return result, nil
 }
 
-func getSalt() string {
+func getSalt() (string, error) {
 
 	//从环境变量获取盐
 	salt := os.Getenv("SALT")
 	if salt != "" {
-		return salt
+		return salt, nil
 	}
 	//从命令行参数获取盐
 	//变量指针、命令行参数的名称、默认值和命令行参数的描述
 	flag.StringVar(&salt, "salt", "", "the salt value")
-	return salt
+	if salt == "" {
+		return "", errors.New("3006")
+	}
+	return salt, nil
 }

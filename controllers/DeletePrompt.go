@@ -22,6 +22,12 @@ func DeletePrompt(c *gin.Context) {
 		return
 	}
 
+	slice := []string{reqBody.ApiKey, reqBody.PromptsId}
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
+
 	apiKeyCheck := utils.IsValidApiKey(reqBody.ApiKey)
 	if apiKeyCheck == false {
 		var errCode models.ErrCode
@@ -30,7 +36,11 @@ func DeletePrompt(c *gin.Context) {
 		return
 	}
 
-	uid := utils.Encrypt(reqBody.ApiKey) //用户id
+	uid, err := utils.Encrypt(reqBody.ApiKey) //用户id
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
+		return
+	}
 	id := reqBody.PromptsId
 
 	err = utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error

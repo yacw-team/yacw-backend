@@ -10,10 +10,24 @@ import (
 
 // CreatePersonality 用户创建personality
 func CreatePersonality(c *gin.Context) {
-	uid := utils.Encrypt(c.PostForm("apiKey"))
+	var err error
+	uid := c.PostForm("apiKey")
 	modelName := c.PostForm("name")
 	description := c.PostForm("description")
 	prompts := c.PostForm("prompts")
+
+	//检测utf-8编码
+	slice := []string{uid, modelName, description, prompts}
+	if !utils.Utf8Check(slice) {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
+		return
+	}
+
+	uid, err = utils.Encrypt(uid)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
+		return
+	}
 
 	if len(strings.TrimSpace(modelName)) == 0 {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1007"})
@@ -32,7 +46,7 @@ func CreatePersonality(c *gin.Context) {
 		Prompts:     prompts,
 	}
 
-	err := utils.DB.Table("personality").Create(&personality).Error
+	err = utils.DB.Table("personality").Create(&personality).Error
 	if err != nil {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "3009"})
 		return
