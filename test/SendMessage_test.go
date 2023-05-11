@@ -84,3 +84,60 @@ func TestSendMessageFormatMixing(t *testing.T) {
 	expected := `{"errCode":"3004"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestSendMessageApiKeyNull(t *testing.T) {
+	utils.InitDBTest()
+	var jsonStr = []byte(`{
+    "apiKey": "",
+    "chatId": "2",
+    "content": {
+        "user": "再多说一些"
+    }
+}`)
+	req, err := http.NewRequest("POST", "/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"2006"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestSendMessageChatIdNull(t *testing.T) {
+	utils.InitDBTest()
+	var jsonStr = []byte(`{
+    "apiKey": "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",
+    "chatId": "",
+    "content": {
+        "user": "再多说一些"
+    }
+}`)
+	req, err := http.NewRequest("POST", "/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"2005"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestSendMessageChatIdNoExist(t *testing.T) {
+	utils.InitDBTest()
+	var jsonStr = []byte(`{
+    "apiKey": "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",
+    "chatId": "0",
+    "content": {
+        "user": "再多说一些"
+    }
+}`)
+	req, err := http.NewRequest("POST", "/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"1000"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
