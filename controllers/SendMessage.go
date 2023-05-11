@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -60,6 +59,11 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
+	if systemMessage.Content == "" {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
+		return
+	}
+
 	//查找modelId
 	var modelId int
 	err = utils.DB.Table("chatconversation").Where("id = ?", chatId).Select("modelid").Scan(&modelId).Error
@@ -90,8 +94,6 @@ func SendMessage(c *gin.Context) {
 			Content: systemMessage.Content,
 		},
 	}, message...)
-
-	fmt.Println(message)
 
 	//构造请求体
 	req := openai.ChatCompletionRequest{

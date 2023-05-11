@@ -12,23 +12,23 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	//添加中间件
 	r.Use(ApiPrefixMiddleware())
-	r.GET("/v1/chat/prompts", controllers.GetPromptShop)
-	r.POST("/v1/chat/myprompts", AuthMiddleware(), controllers.GetMyPrompt)
-	r.POST("/v1/chat/prompts", controllers.CreatePrompt)
-	r.DELETE("/v1/chat/prompts", controllers.DeletePrompt)
-	r.POST("/v1/chat/apiKey", controllers.VerifyApiKey)
-	r.GET("/v1/chat/personality", controllers.GetPersonalityShop)
-	r.POST("/v1/chat/mypersonality", AuthMiddleware(), controllers.GetMyPersonality)
-	r.POST("/v1/chat/personality", controllers.CreatePersonality)
-	r.DELETE("/v1/chat/personality", controllers.DeletePersonality)
+	r.GET("/api/v1/chat/prompts", controllers.GetPromptShop)
+	r.POST("/api/v1/chat/myprompts", AuthMiddleware(), controllers.GetMyPrompt)
+	r.POST("/api/v1/chat/prompts", controllers.CreatePrompt)
+	r.DELETE("/api/v1/chat/prompts", controllers.DeletePrompt)
+	r.POST("/api/v1/chat/apiKey", controllers.VerifyApiKey)
+	r.GET("/api/v1/chat/personality", controllers.GetPersonalityShop)
+	r.POST("/api/v1/chat/mypersonality", AuthMiddleware(), controllers.GetMyPersonality)
+	r.POST("/api/v1/chat/personality", controllers.CreatePersonality)
+	r.DELETE("/api/v1/chat/personality", controllers.DeletePersonality)
 
-	r.POST("/v1/chat/getmessage", controllers.GetChatMessage)
-	r.POST("/v1/chat/getchat", controllers.GetChatId)
+	r.POST("/api/v1/chat/getmessage", controllers.GetChatMessage)
+	r.POST("/api/v1/chat/getchat", controllers.GetChatId)
 
-	r.POST("/v1/translate/translate", AuthMiddleware(), controllers.Translate)
-	r.POST("/v1/chat/chat", AuthMiddleware(), controllers.SendMessage)
-	r.POST("/v1/chat/new", AuthMiddleware(), controllers.NewChat)
-	r.DELETE("/v1/chat/chat", AuthMiddleware(), controllers.DeleteChat)
+	r.POST("/api/v1/translate/translate", AuthMiddleware(), controllers.Translate)
+	r.POST("/api/v1/chat/chat", AuthMiddleware(), controllers.SendMessage)
+	r.POST("/api/v1/chat/new", AuthMiddleware(), controllers.NewChat)
+	r.DELETE("/api/v1/chat/chat", AuthMiddleware(), controllers.DeleteChat)
 	return r
 }
 
