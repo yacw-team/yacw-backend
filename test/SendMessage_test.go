@@ -27,7 +27,7 @@ func TestSendMessageCorrectExample(t *testing.T) {
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestSendMessage := &RequestSendMessage{
 		ApiKey: apiKey,
-		ChatId: "2",
+		ChatId: "1",
 		Content: Content{
 			User: "再多说一些",
 		},
