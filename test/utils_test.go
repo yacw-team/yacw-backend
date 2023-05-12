@@ -24,9 +24,9 @@ func TestEncryptPassword(t *testing.T) {
 func TestDeleteChat(t *testing.T) {
 	utils.InitDBTest()
 	r := routes.SetupRouter()
-	utils.DB.Table("chatconversation").Create(&models.ChatConversation{Id: 1, Title: "123", Uid: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", ModelId: 0})
-	utils.DB.Table("chatmessage").Create(&models.ChatMessage{Id: 1, Content: "123", ChatId: 1, Actor: "user", Show: 1})
-	var temp = chat.DeleteRequest{ApiKey: "123", ChatId: "1"}
+	utils.DB.Table("chatconversation").Create(&models.ChatConversation{Id: 10, Title: "123", Uid: "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3", ModelId: 0})
+	utils.DB.Table("chatmessage").Create(&models.ChatMessage{Id: 50, Content: "123", ChatId: 10, Actor: "user", Show: 1})
+	var temp = chat.DeleteRequest{ApiKey: "123", ChatId: "10"}
 	json, err := json2.Marshal(&temp)
 	reader := bytes.NewReader(json)
 	if err == nil {
@@ -34,6 +34,7 @@ func TestDeleteChat(t *testing.T) {
 		resp := httptest.NewRecorder()
 		r.ServeHTTP(resp, req)
 
+		print(resp.Body.String())
 		assert.Equal(t, http.StatusOK, resp.Code)
 	} else {
 		assert.Equal(t, 1, 2)
