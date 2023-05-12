@@ -23,12 +23,17 @@ func GetPromptShop(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 			return
 		}
-		c.JSON(http.StatusOK, prompts)
+		c.JSON(http.StatusOK, gin.H{
+			"Prompts": prompts,
+		})
+		return
 	}
 	err := utils.DB.Table("prompt").Where("designer = ? AND type = ?", 0, promptsType).Find(&prompts).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
-	c.JSON(http.StatusOK, prompts)
+	c.JSON(http.StatusOK, gin.H{
+		"Prompts": prompts,
+	})
 }

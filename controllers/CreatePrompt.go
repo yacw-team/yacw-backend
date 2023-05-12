@@ -11,10 +11,18 @@ import (
 // CreatePrompt 用户创建prompt
 func CreatePrompt(c *gin.Context) {
 	var err error
-	uid := c.PostForm("apiKey")
-	modelName := c.PostForm("name")
-	description := c.PostForm("description")
-	prompts := c.PostForm("prompts")
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
+	if ok == false {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
+		return
+	}
+	reqBody = reqTemp.(map[string]interface{})
+
+	uid := reqBody["apiKey"].(string)
+	modelName := reqBody["name"].(string)
+	description := reqBody["description"].(string)
+	prompts := reqBody["prompt"].(string)
 
 	//检测utf-8编码
 	slice := []string{uid, modelName, description, prompts}
