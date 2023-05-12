@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
@@ -15,7 +14,7 @@ func CreatePersonality(c *gin.Context) {
 	var err error
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
-	if ok == false {
+	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
@@ -25,8 +24,6 @@ func CreatePersonality(c *gin.Context) {
 	name := reqBody["name"].(string)
 	description := reqBody["description"].(string)
 	prompts := reqBody["prompt"].(string)
-
-	fmt.Println(uid + name + description + prompts)
 
 	//检测utf-8编码
 	slice := []string{uid, name, description, prompts}

@@ -16,7 +16,7 @@ var model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k"
 func SendMessage(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
-	if ok == false {
+	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
@@ -34,7 +34,7 @@ func SendMessage(c *gin.Context) {
 	}
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
-	if apiKeyCheck == false {
+	if !apiKeyCheck {
 		var errCode models.ErrCode
 		errCode.ErrCode = "3004"
 		c.JSON(http.StatusBadRequest, errCode)

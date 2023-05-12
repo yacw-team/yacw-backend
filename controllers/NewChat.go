@@ -41,7 +41,7 @@ func NewChat(c *gin.Context) {
 
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
-	if ok == false {
+	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
@@ -70,7 +70,7 @@ func NewChat(c *gin.Context) {
 	}
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
-	if apiKeyCheck == false {
+	if !apiKeyCheck {
 		var errCode models.ErrCode
 		errCode.ErrCode = "3004"
 		c.JSON(http.StatusBadRequest, errCode)

@@ -13,7 +13,7 @@ func CreatePrompt(c *gin.Context) {
 	var err error
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
-	if ok == false {
+	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
