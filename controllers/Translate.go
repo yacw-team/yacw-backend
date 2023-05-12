@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -111,6 +112,7 @@ func Translate(c *gin.Context) {
 
 	resp, err := client.CreateChatCompletion(ctx, req)
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
 		return
 	}
