@@ -35,7 +35,6 @@ func TestNewChat(t *testing.T) {
 		req, _ := http.NewRequest("POST", "/api/v1/chat/new", reader)
 		resp := httptest.NewRecorder()
 		r.ServeHTTP(resp, req)
-		print(resp.Body.String())
 		assert.Equal(t, http.StatusOK, resp.Code)
 	} else {
 		t.Fatal(err)
