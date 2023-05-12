@@ -165,3 +165,24 @@ func TestSendMessageChatIdNoExist(t *testing.T) {
 	expected := `{"errCode":"1005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestSendMessageChatIdMixing(t *testing.T) {
+	utils.InitDBTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendMessage := &RequestSendMessage{
+		ApiKey: apiKey,
+		ChatId: "我",
+		Content: Content{
+			User: "再多说一些",
+		},
+	}
+	jsonStr, err := json.Marshal(requestSendMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"2005"}`
+	assert.Equal(t, expected, rr.Body.String())
+}

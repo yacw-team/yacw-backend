@@ -111,7 +111,7 @@ func TestGetChatMessageChatIdMiss(t *testing.T) {
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestChatMessage := &RequestChatMessage{
 		ApiKey: apiKey,
-		ChatId: "9999",
+		ChatId: "15960733635",
 	}
 	jsonStr, err := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
@@ -120,6 +120,24 @@ func TestGetChatMessageChatIdMiss(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"3009"}`
+	expected := `{"chatId":0,"messages":null}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestGetChatMessageChatIdMixing(t *testing.T) {
+	utils.InitDBTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestChatMessage := &RequestChatMessage{
+		ApiKey: apiKey,
+		ChatId: "我",
+	}
+	jsonStr, err := json.Marshal(requestChatMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"2006"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
