@@ -123,16 +123,7 @@ func NewChat(c *gin.Context) {
 	assistantMessage.Actor = "assistant"
 	assistantMessage.Show = 1
 	//插入系统消息，用户消息，回答的消息
-	err = utils.DB.Table("chatmessage").Create(&systemMessage).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-		return
-	}
-	err = utils.DB.Table("chatmessage").Create(&userMessage).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
-		return
-	}
+
 	assistantResponse, err = ChattingWithGPT(apiKey, user, systemContent, modelId)
 
 	if err != nil {
@@ -144,6 +135,17 @@ func NewChat(c *gin.Context) {
 	utils.DB.Table("chatmessage").Create(&assistantMessage)
 	titleString := "帮我根据以下的文本想一个标题（注意直接返回一个标题，我想直接使用，正式一些，字数在4-6个字）：" + user
 	title, err = ChattingWithGPT(apiKey, titleString, systemContent, modelId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		return
+	}
+
+	err = utils.DB.Table("chatmessage").Create(&systemMessage).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
+	err = utils.DB.Table("chatmessage").Create(&userMessage).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
 		return
