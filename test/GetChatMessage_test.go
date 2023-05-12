@@ -24,7 +24,7 @@ func TestGetChatMessageCorrectExample(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "1",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -41,7 +41,7 @@ func TestGetChatMessageMissingLength(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "1",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -59,7 +59,7 @@ func TestGetChatMessageExcessiveLength(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "1",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -77,7 +77,7 @@ func TestGetChatMessageFormatMixing(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "1",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -95,7 +95,7 @@ func TestGetChatMessageApiKeyNull(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "1",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -113,7 +113,7 @@ func TestGetChatMessageChatIdMiss(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "15960733635",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -131,7 +131,7 @@ func TestGetChatMessageChatIdMixing(t *testing.T) {
 		ApiKey: apiKey,
 		ChatId: "我",
 	}
-	jsonStr, err := json.Marshal(requestChatMessage)
+	jsonStr, _ := json.Marshal(requestChatMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)

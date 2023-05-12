@@ -18,12 +18,14 @@ type RequestChatId struct {
 
 func TestGetChatIdCorrectExample(t *testing.T) {
 	utils.InitDBTest()
+	var err error
+	var req *http.Request
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestChatId := &RequestChatId{
 		ApiKey: apiKey,
 	}
-	jsonStr, err := json.Marshal(requestChatId)
-	req, err := http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,12 +36,14 @@ func TestGetChatIdCorrectExample(t *testing.T) {
 
 func TestGetChatIdMissingLength(t *testing.T) {
 	utils.InitDBTest()
+	var err error
+	var req *http.Request
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MISSING")
 	requestChatId := &RequestChatId{
 		ApiKey: apiKey,
 	}
-	jsonStr, err := json.Marshal(requestChatId)
-	req, err := http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -51,12 +55,14 @@ func TestGetChatIdMissingLength(t *testing.T) {
 
 func TestGetChatIdExcessiveLength(t *testing.T) {
 	utils.InitDBTest()
+	var err error
+	var req *http.Request
 	apiKey := os.Getenv("TEST_OPENAI_KEY_EXCESSIVE")
 	requestChatId := &RequestChatId{
 		ApiKey: apiKey,
 	}
-	jsonStr, err := json.Marshal(requestChatId)
-	req, err := http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,12 +74,14 @@ func TestGetChatIdExcessiveLength(t *testing.T) {
 
 func TestGetChatIdFormatMixing(t *testing.T) {
 	utils.InitDBTest()
+	var err error
+	var req *http.Request
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MIXING")
 	requestChatId := &RequestChatId{
 		ApiKey: apiKey,
 	}
-	jsonStr, err := json.Marshal(requestChatId)
-	req, err := http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -85,12 +93,14 @@ func TestGetChatIdFormatMixing(t *testing.T) {
 
 func TestGetChatIdApiKeyNull(t *testing.T) {
 	utils.InitDBTest()
+	var err error
+	var req *http.Request
 	apiKey := ""
 	requestChatId := &RequestChatId{
 		ApiKey: apiKey,
 	}
-	jsonStr, err := json.Marshal(requestChatId)
-	req, err := http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
 	}

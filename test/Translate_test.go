@@ -40,7 +40,7 @@ func TestTranslateCorrectExample(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -64,7 +64,7 @@ func TestTranslateMissingLength(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -89,7 +89,7 @@ func TestTranslateExcessiveLength(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -114,7 +114,7 @@ func TestTranslateFormatMixing(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -139,7 +139,7 @@ func TestTranslateModelIdNull(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -164,7 +164,7 @@ func TestTranslateModelIdCross(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -189,7 +189,7 @@ func TestTranslateModelIdMixing(t *testing.T) {
 		From: "english",
 		To:   "chinese",
 	}
-	jsonStr, err := json.Marshal(requestTranslate)
+	jsonStr, _ := json.Marshal(requestTranslate)
 	req, err := http.NewRequest("POST", "/api/v1/translate/translate", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)

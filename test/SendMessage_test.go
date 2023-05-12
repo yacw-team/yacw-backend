@@ -32,7 +32,7 @@ func TestSendMessageCorrectExample(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -52,7 +52,7 @@ func TestSendMessageMissingLength(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -73,7 +73,7 @@ func TestSendMessageExcessiveLength(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -94,7 +94,7 @@ func TestSendMessageFormatMixing(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -134,7 +134,7 @@ func TestSendMessageChatIdNull(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -155,7 +155,7 @@ func TestSendMessageChatIdNoExist(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
@@ -176,7 +176,7 @@ func TestSendMessageChatIdMixing(t *testing.T) {
 			User: "再多说一些",
 		},
 	}
-	jsonStr, err := json.Marshal(requestSendMessage)
+	jsonStr, _ := json.Marshal(requestSendMessage)
 	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
 	if err != nil {
 		t.Fatal(err)
