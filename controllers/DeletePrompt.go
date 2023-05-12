@@ -29,7 +29,7 @@ func DeletePrompt(c *gin.Context) {
 	}
 
 	apiKeyCheck := utils.IsValidApiKey(reqBody.ApiKey)
-	if apiKeyCheck == false {
+	if !apiKeyCheck {
 		var errCode models.ErrCode
 		errCode.ErrCode = "3004"
 		c.JSON(http.StatusBadRequest, errCode)
