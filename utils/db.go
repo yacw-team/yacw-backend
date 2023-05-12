@@ -14,3 +14,11 @@ func InitDB() {
 		panic("failed to connect database")
 	}
 }
+
+func InitDBTest() {
+	var err error
+	DB, err = gorm.Open(sqlite.Open("databaseTest.db"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+}
