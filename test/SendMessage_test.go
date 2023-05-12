@@ -183,6 +183,6 @@ func TestSendMessageChatIdMixing(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"2006"}`
+	expected := `{"errCode":"2005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
