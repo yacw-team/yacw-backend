@@ -7,7 +7,6 @@ import (
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
-	"strconv"
 )
 
 var model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k", "gpt-4-32K-0314", "gpt-4-0314"}
@@ -25,9 +24,9 @@ func SendMessage(c *gin.Context) {
 	//获取数据
 	apiKey := reqBody["apiKey"].(string)
 	user := reqBody["content"].(map[string]interface{})["user"].(string)
-	chatStr := reqBody["chatId"].(string)
+	chatId := reqBody["chatId"].(string)
 
-	slice := []string{apiKey, user, chatStr}
+	slice := []string{apiKey, user, chatId}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
 		return
@@ -41,19 +40,13 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	chatId, err := strconv.Atoi(chatStr)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
-		return
-	}
-
 	// 创建 OpenAI 客户端
 	client := openai.NewClient(apiKey)
 	ctx := context.Background()
 
 	//查找第一句system
 	var systemMessage models.ChatMessage
-	err = utils.DB.Table("chatmessage").Where("chatid = ? AND actor = ?", chatId, "system").Find(&systemMessage).Error
+	err := utils.DB.Table("chatmessage").Where("chatid = ? AND actor = ?", chatId, "system").Find(&systemMessage).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
@@ -137,7 +130,7 @@ func SendMessage(c *gin.Context) {
 
 	//将用户的对话和API的回复存入数据库
 	c.JSON(http.StatusOK, gin.H{
-		"chatId": strconv.Itoa(chatId),
+		"chatId": chatId,
 		"content": gin.H{
 			"user":      user,
 			"assistant": assistant,

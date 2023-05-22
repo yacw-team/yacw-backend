@@ -28,7 +28,7 @@ func SetupRouter() *gin.Engine {
 	r.POST("/api/v1/translate/translate", AuthMiddleware(), controllers.Translate)
 	r.POST("/api/v1/chat/chat", AuthMiddleware(), controllers.SendMessage)
 	r.POST("/api/v1/chat/new", AuthMiddleware(), controllers.NewChat)
-	r.DELETE("/api/v1/chat/chat", AuthMiddleware(), controllers.DeleteChat)
+	r.POST("/api/v1/chat/deletechat", AuthMiddleware(), controllers.DeleteChat)
 	return r
 }
 

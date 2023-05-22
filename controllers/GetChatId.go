@@ -12,7 +12,7 @@ type RequestGetChatId struct {
 }
 
 type Chat struct {
-	ChatId int    `json:"chatId"`
+	ChatId string `json:"chatId"`
 	Title  string `json:"title"`
 }
 

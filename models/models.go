@@ -13,7 +13,7 @@ type Prompt struct {
 	Designer    int64  `json:"-"`
 }
 type ChatConversation struct {
-	Id      int
+	Id      string
 	Title   string `gorm:"column:title"`
 	Uid     string `gorm:"column:uid"`
 	ModelId int    `gorm:"column:modelid"`
@@ -22,7 +22,7 @@ type ChatConversation struct {
 type ChatMessage struct {
 	Id      int
 	Content string
-	ChatId  int `gorm:"column:chatid"`
+	ChatId  string `gorm:"column:chatid"`
 	Actor   string
 	Show    int
 }
