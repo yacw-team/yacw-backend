@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -36,8 +35,8 @@ func VerifyApiKey(c *gin.Context) {
 	_, err := client.CreateChatCompletion(ctx, req)
 
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusUnauthorized, models.ErrCode{ErrCode: "1002"})
+		errCode := utils.GPTRequestErrorCode(err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
 	}
 
