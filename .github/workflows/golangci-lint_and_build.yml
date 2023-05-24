@@ -33,3 +33,12 @@ jobs:
           
       - name: Test build
         run: go build -v ./...
+
+      - name: Unit test
+        run: go test ./test
+        env:
+          SALT: ${{ secrets.SALT }}
+          TEST_OPENAI_KEY: ${{ secrets.TEST_OPENAI_KEY }}
+          TEST_OPENAI_KEY_EXCESSIVE: ${{ secrets.TEST_OPENAI_KEY_EXCESSIVE }}
+          TEST_OPENAI_KEY_MISSING: ${{ secrets.TEST_OPENAI_KEY_MISSING }}
+          TEST_OPENAI_KEY_MIXING: ${{ secrets.TEST_OPENAI_KEY_MIXING }}
