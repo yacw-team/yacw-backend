@@ -14,7 +14,7 @@ type RequestGetMessage struct {
 }
 
 type ResponseGetMessage struct {
-	ChatId   int       `gorm:"column:chatid" json:"chatId"`
+	ChatId   string    `gorm:"column:chatid" json:"chatId"`
 	Messages []Message `json:"messages"`
 }
 

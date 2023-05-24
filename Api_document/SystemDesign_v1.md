@@ -149,7 +149,7 @@ Res:
 
 #### 发送对话
 
-URL: POST /v1/chat/chat
+URL: POST /v1/chat/deletechat
 
 Req:
 

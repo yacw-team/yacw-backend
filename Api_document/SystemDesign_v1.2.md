@@ -136,7 +136,7 @@ Req:
 ```
 {
     apiKey: string,
-    modelID: int,
+    modelId: string,
     content: {
         personalityId: string,//构造system
         user: string,      // user input
@@ -148,8 +148,8 @@ Res:
 
 ```
 {
-    chatId: string,
-    model: string,
+    chatId: int,
+    modelId: int,
     content: {
         personalityId: string,
         user: string,      // user input
@@ -286,7 +286,15 @@ Res:
 
 #### 获取用户自主创建的Prompts
 
-URL：GET/v1/chat/myprompts
+URL：POST/v1/chat/myprompts
+
+Req:
+
+```
+{
+	apiKey:string,
+}
+```
 
 Res：
 
@@ -356,6 +364,14 @@ Res:
 
 URL：GET /v1/chat/personality
 
+Req:
+
+```
+{
+	apiKey:string,
+}
+```
+
 Res:
 
 ```
@@ -376,7 +392,15 @@ Res:
 
 #### 获取用户创建的人格
 
-URL:GET/v1/chat/mypersonality
+URL:POST/v1/chat/mypersonality
+
+Req:
+
+```
+{
+	apiKey:string,
+}
+```
 
 Res:
 

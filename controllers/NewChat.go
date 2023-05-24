@@ -49,6 +49,7 @@ func NewChat(c *gin.Context) {
 
 	apiKey := reqBody["apiKey"].(string)
 	modelStr := reqBody["modelId"].(string)
+	chatId := reqBody["chatId"].(string)
 	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
 	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
@@ -92,7 +93,7 @@ func NewChat(c *gin.Context) {
 	if err != nil {
 		maxMessage = 0
 	}
-	chatConversation.Id = max + 1
+	chatConversation.Id = chatId
 	chatConversation.Uid = uid
 	chatConversation.ModelId = modelId
 	//人格设置，默认你是个帮手
@@ -147,7 +148,7 @@ func NewChat(c *gin.Context) {
 	}
 	err = utils.DB.Table("chatmessage").Create(&userMessage).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 
