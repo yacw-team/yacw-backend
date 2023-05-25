@@ -137,6 +137,7 @@ Req:
 {
     apiKey: string,
     modelId: string,
+    chatId: string,//前端生成uuid做为chatid给后端
     content: {
         personalityId: string,//构造system
         user: string,      // user input
@@ -148,8 +149,8 @@ Res:
 
 ```
 {
-    chatId: int,
-    modelId: int,
+    chatId: string,
+    modelId: string,
     content: {
         personalityId: string,
         user: string,      // user input
