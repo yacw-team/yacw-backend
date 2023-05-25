@@ -31,7 +31,6 @@ type ResponseNewContent struct {
 // NewChat 新建对话API，路由/v1/chat/new
 func NewChat(c *gin.Context) {
 	var response NewChatResponse
-	var max int
 	var maxMessage int
 	var chatConversation models.ChatConversation
 	var systemMessage, userMessage, assistantMessage models.ChatMessage
@@ -82,11 +81,6 @@ func NewChat(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
-	}
-	//获取最大的对话id
-	err = utils.DB.Table("chatconversation").Select("COALESCE(MAX(id), 0)").Row().Scan(&max)
-	if err != nil {
-		max = 0
 	}
 	//获取最大的消息id
 	err = utils.DB.Table("chatmessage").Select("COALESCE(MAX(id), 0)").Find(&maxMessage).Error
@@ -167,7 +161,7 @@ func NewChat(c *gin.Context) {
 	response.Content.User = user
 	response.Content.PersonalityId = personalityId
 	response.ModelId = strconv.Itoa(modelId)
-	response.ChatId = strconv.Itoa(max + 1)
+	response.ChatId = chatId
 	c.JSON(http.StatusOK, response)
 
 }
