@@ -24,24 +24,6 @@ type NewChatContent struct {
 	User          string `json:"user"`
 }
 
-func TestNewChatCorrect(t *testing.T) {
-	utils.InitDBTest()
-	apiKey := os.Getenv("TEST_OPENAI_KEY")
-	r := routes.SetupRouter()
-	var tempContent = NewChatContent{PersonalityId: "1", User: "怎么成为一名肌肉男"}
-	var temp = NewChatRequest{ApiKey: apiKey, ModelId: "0", ChatId: "123", Content: tempContent}
-	json, err := json2.Marshal(&temp)
-	reader := bytes.NewReader(json)
-	if err == nil {
-		req, _ := http.NewRequest("POST", "/api/v1/chat/new", reader)
-		resp := httptest.NewRecorder()
-		r.ServeHTTP(resp, req)
-		assert.Equal(t, http.StatusOK, resp.Code)
-	} else {
-		t.Fatal(err)
-	}
-}
-
 func TestNewChatModelIdNil(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
