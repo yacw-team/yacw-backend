@@ -37,7 +37,7 @@ type Personality struct {
 }
 
 type Game struct {
-	gameId      string `gorm:"column:gameId"`
-	name        string
-	description string
+	GameId      string `gorm:"column:gameId"`
+	Name        string
+	Description string
 }

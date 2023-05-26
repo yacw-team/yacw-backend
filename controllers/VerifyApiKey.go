@@ -10,10 +10,6 @@ import (
 	"net/http"
 )
 
-type request struct {
-	apiKey string `json:"apiKey""`
-}
-
 func VerifyApiKey(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
