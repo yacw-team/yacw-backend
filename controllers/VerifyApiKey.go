@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -9,9 +10,21 @@ import (
 	"net/http"
 )
 
-func VerifyApiKey(c *gin.Context) {
+type request struct {
+	apiKey string `json:"apiKey""`
+}
 
-	apiKey := c.PostForm("apiKey")
+func VerifyApiKey(c *gin.Context) {
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
+
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
+		return
+	}
+	reqBody = reqTemp.(map[string]interface{})
+
+	apiKey := reqBody["apiKey"].(string)
 
 	slice := []string{apiKey}
 	if !utils.Utf8Check(slice) {
@@ -35,10 +48,11 @@ func VerifyApiKey(c *gin.Context) {
 	_, err := client.CreateChatCompletion(ctx, req)
 
 	if err != nil {
+		fmt.Println(err)
 		errCode := utils.GPTRequestErrorCode(err)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "1002"})
+	c.Status(http.StatusOK)
 }
