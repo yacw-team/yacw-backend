@@ -1,4 +1,4 @@
-package controllers
+package Chat
 
 import (
 	"github.com/gin-gonic/gin"

@@ -1,4 +1,4 @@
-package controllers
+package Prompt
 
 import (
 	"github.com/gin-gonic/gin"
