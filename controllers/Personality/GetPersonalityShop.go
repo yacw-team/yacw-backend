@@ -1,4 +1,4 @@
-package controllers
+package Personality
 
 import (
 	"github.com/gin-gonic/gin"

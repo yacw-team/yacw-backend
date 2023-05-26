@@ -1,4 +1,4 @@
-package controllers
+package Prompt
 
 import (
 	"github.com/gin-gonic/gin"
@@ -22,7 +22,7 @@ func CreatePrompt(c *gin.Context) {
 	uid := reqBody["apiKey"].(string)
 	modelName := reqBody["name"].(string)
 	description := reqBody["description"].(string)
-	prompts := reqBody["prompt"].(string)
+	prompts := reqBody["prompts"].(string)
 
 	//检测utf-8编码
 	slice := []string{uid, modelName, description, prompts}

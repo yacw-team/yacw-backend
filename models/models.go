@@ -35,3 +35,9 @@ type Personality struct {
 	Uid         string `json:"-"`
 	Designer    string `json:"-"`
 }
+
+type Game struct {
+	gameId      string `gorm:"column:gameId"`
+	name        string
+	description string
+}

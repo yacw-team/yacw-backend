@@ -1,4 +1,4 @@
-package controllers
+package Chat
 
 import (
 	"context"
@@ -173,7 +173,7 @@ func ChattingWithGPT(apiKey string, question string, system string, modelId int)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: model[modelId],
+			Model: Model[modelId],
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,

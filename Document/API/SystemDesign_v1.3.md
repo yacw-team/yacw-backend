@@ -171,7 +171,7 @@ Res:
 
 ```
 {
-    prompts: [
+    Prompts: [
         {
             id: string,
             name: string,					//名称
@@ -201,7 +201,7 @@ Res：
 
 ```
 {
-    prompts: [
+    Prompts: [
         {
             id: string,
             name: string,					//名称
@@ -226,7 +226,6 @@ Req:
     apiKey: string,
     name: string,					//名称
     description: string,	//描述
-    icon:string,            //
     prompts: string,			//具体的prompts
 }
 ```
@@ -238,7 +237,6 @@ Res:
     id: string,
     name: string,					//名称
     description: string,	//描述
-    icon:string,					//
     prompts: string,			//具体的prompts
 }
 ```
