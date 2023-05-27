@@ -245,7 +245,7 @@ Res:
 
 #### 删除用户 Prompts
 
-URL：DELETE /v1/chat/prompts
+URL：POST /v1/chat/deleteprompts
 
 Req:
 

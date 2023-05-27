@@ -17,7 +17,7 @@ func DeletePrompt(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apKey"].(string)
+	apiKey := reqBody["apiKey"].(string)
 	promptId := reqBody["promptsId"].(string)
 
 	slice := []string{apiKey, promptId}
