@@ -361,6 +361,7 @@ Req:
 {
     apiKey: string,
     gameId: string,
+    modelId: string,
 }
 ```
 
@@ -370,7 +371,10 @@ Res:
 {
     story:string,//故事的发展剧情
     choice:[
-    	string,
+    	A:string,
+    	B:string,
+    	C:string,
+    	D:string,
     	...
     ],
     round:int,
@@ -387,6 +391,7 @@ Req:
 {
     apiKey: string,
     choiceID: string,//A,B,C,D
+    modelId: string,
 }
 ```
 
@@ -398,7 +403,10 @@ Res:
 {
 	story:string,//故事的发展剧情
     choice:[
-    	string,
+    	A:string,
+    	B:string,
+    	C:string,
+    	D:string,
     	...
     ],//(A,B,C,D四个选项)
     round:int,
