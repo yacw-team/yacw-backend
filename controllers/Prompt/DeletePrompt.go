@@ -7,28 +7,26 @@ import (
 	"net/http"
 )
 
-type deletePromptReqBody struct {
-	ApiKey    string `json:"apiKey"`
-	PromptsId string `json:"promptsId"`
-}
-
 // DeletePrompt 删除用户创建的prompt
 func DeletePrompt(c *gin.Context) {
-	var reqBody deletePromptReqBody
-	err := c.Bind(&reqBody)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1010"})
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
 		return
 	}
+	reqBody = reqTemp.(map[string]interface{})
 
-	slice := []string{reqBody.ApiKey, reqBody.PromptsId}
+	apiKey := reqBody["apKey"].(string)
+	promptId := reqBody["promptsId"].(string)
+
+	slice := []string{apiKey, promptId}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
 		return
 	}
 
-	apiKeyCheck := utils.IsValidApiKey(reqBody.ApiKey)
+	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if !apiKeyCheck {
 		var errCode models.ErrCode
 		errCode.ErrCode = "3004"
@@ -36,12 +34,12 @@ func DeletePrompt(c *gin.Context) {
 		return
 	}
 
-	uid, err := utils.Encrypt(reqBody.ApiKey) //用户id
+	uid, err := utils.Encrypt(apiKey) //用户id
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
 	}
-	id := reqBody.PromptsId
+	id := promptId
 
 	err = utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error
 	if err != nil {
