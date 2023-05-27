@@ -21,6 +21,12 @@ type ResponseGetChatId struct {
 }
 
 func GetChatId(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var requestGetChatId RequestGetChatId
 	var responseGetChatId ResponseGetChatId
 	var errRequestGetChatId = c.ShouldBindJSON(&requestGetChatId)
