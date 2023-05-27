@@ -4,12 +4,11 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/yacw-team/yacw/controllers"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
 )
-
-var Model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k", "gpt-4-32K-0314", "gpt-4-0314"}
 
 // SendMessage 发送对话
 func SendMessage(c *gin.Context) {
@@ -90,7 +89,7 @@ func SendMessage(c *gin.Context) {
 
 	//构造请求体
 	req := openai.ChatCompletionRequest{
-		Model:    Model[modelId],
+		Model:    controllers.Model[modelId],
 		Messages: message,
 	}
 
