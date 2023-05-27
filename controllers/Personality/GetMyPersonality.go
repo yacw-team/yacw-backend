@@ -8,6 +8,12 @@ import (
 )
 
 func GetMyPersonality(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var personality []models.Personality
 	var reqBody map[string]interface{}
 	var err error
