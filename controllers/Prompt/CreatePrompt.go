@@ -10,6 +10,12 @@ import (
 
 // CreatePrompt 用户创建prompt
 func CreatePrompt(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var err error
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
