@@ -14,6 +14,12 @@ type DeleteChatReqBody struct {
 }
 
 func DeleteChat(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {

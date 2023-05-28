@@ -24,6 +24,12 @@ type Message struct {
 }
 
 func GetChatMessage(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var requestGetMessage RequestGetMessage
 	var responseGetMessage ResponseGetMessage
 	var errRequestGetMessage = c.ShouldBindJSON(&requestGetMessage)

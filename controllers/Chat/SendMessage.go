@@ -13,6 +13,12 @@ var Model = []string{"gpt-3.5-turbo", "gpt-3.5-turbo-0301", "gpt-4", "gpt-4-32k"
 
 // SendMessage 发送对话
 func SendMessage(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
