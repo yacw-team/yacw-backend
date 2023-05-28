@@ -19,12 +19,10 @@ func SetupRouter() *gin.Engine {
 	r.GET("/api/v1/chat/prompts", Prompt.GetPromptShop)
 	r.POST("/api/v1/chat/myprompts", AuthMiddleware(), Prompt.GetMyPrompt)
 	r.POST("/api/v1/chat/prompts", AuthMiddleware(), Prompt.CreatePrompt)
-	r.DELETE("/api/v1/chat/prompts", Prompt.DeletePrompt)
+	r.POST("/api/v1/chat/deleteprompts", AuthMiddleware(), Prompt.DeletePrompt)
 	r.POST("/api/v1/chat/apiKey", AuthMiddleware(), controllers.VerifyApiKey)
 	r.GET("/api/v1/chat/personality", Personality.GetPersonalityShop)
 	r.POST("/api/v1/chat/mypersonality", AuthMiddleware(), Personality.GetMyPersonality)
-	r.POST("/api/v1/chat/personality", AuthMiddleware(), Personality.CreatePersonality)
-	r.DELETE("/api/v1/chat/personality", Personality.DeletePersonality)
 
 	r.POST("/api/v1/chat/getmessage", Chat.GetChatMessage)
 	r.POST("/api/v1/chat/getchat", Chat.GetChatId)
@@ -34,7 +32,8 @@ func SetupRouter() *gin.Engine {
 	r.POST("/api/v1/chat/new", AuthMiddleware(), Chat.NewChat)
 	r.POST("/api/v1/chat/deletechat", AuthMiddleware(), Chat.DeleteChat)
 
-	r.GET("/api/v1/chat/game/story", AuthMiddleware(), Game.GetGameBackground)
+	r.GET("/api/v1/game/story", Game.GetGameBackground)
+	r.POST("/api//v1/game/new", AuthMiddleware(), Game.ChooseGameBackground)
 	return r
 }
 

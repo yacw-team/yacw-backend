@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
+	"github.com/yacw-team/yacw/controllers"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
@@ -179,7 +180,7 @@ func ChattingWithGPT(apiKey string, question string, system string, modelId int)
 	resp, err := client.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model: Model[modelId],
+			Model: controllers.Model[modelId],
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    openai.ChatMessageRoleSystem,

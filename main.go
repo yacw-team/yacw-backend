@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+
 	utils.InitDB()
 
 	r := routes.SetupRouter()

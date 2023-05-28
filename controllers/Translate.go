@@ -4,7 +4,6 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/yacw-team/yacw/controllers/Chat"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
@@ -86,7 +85,7 @@ func Translate(c *gin.Context) {
 	prompt += user
 
 	req := openai.ChatCompletionRequest{
-		Model:     Chat.Model[modelId],
+		Model:     Model[modelId],
 		MaxTokens: 100,
 		Messages: []openai.ChatCompletionMessage{
 			{
