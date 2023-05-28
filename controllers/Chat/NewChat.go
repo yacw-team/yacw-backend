@@ -31,6 +31,12 @@ type ResponseNewContent struct {
 
 // NewChat 新建对话API，路由/v1/chat/new
 func NewChat(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var response NewChatResponse
 	var maxMessage int
 	var chatConversation models.ChatConversation

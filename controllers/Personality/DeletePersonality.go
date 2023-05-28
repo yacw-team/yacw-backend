@@ -14,6 +14,12 @@ type deletePersonalityReqBody struct {
 
 // DeletePersonality 删除用户创建的Personality
 func DeletePersonality(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 
 	var err error
 	var reqBody deletePersonalityReqBody
