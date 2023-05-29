@@ -34,6 +34,7 @@ func SetupRouter() *gin.Engine {
 
 	r.GET("/api/v1/game/story", Game.GetGameBackground)
 	r.POST("/api//v1/game/new", AuthMiddleware(), Game.ChooseGameBackground)
+	r.POST("/api//v1/game/chat", AuthMiddleware(), Game.SendGameMessage)
 	return r
 }
 
