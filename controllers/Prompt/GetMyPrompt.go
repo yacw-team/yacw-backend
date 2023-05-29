@@ -17,9 +17,14 @@ func GetMyPrompt(c *gin.Context) {
 	}()
 	var prompts []models.Prompt
 	var reqBody map[string]interface{}
-	var err error
+	reqTemp, ok := c.Get("reqBody")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
+		return
+	}
+	reqBody = reqTemp.(map[string]interface{})
 	apiKey := reqBody["apiKey"].(string)
-	apiKey, err = utils.Encrypt(apiKey)
+	apiKey, err := utils.Encrypt(apiKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
