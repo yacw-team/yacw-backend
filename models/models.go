@@ -41,3 +41,11 @@ type Game struct {
 	Name        string
 	Description string
 }
+
+type GameMessage struct {
+	Uid    string `gorm:"uid" json:"-"`
+	Story  string `json:"story"`
+	Chocie string `json:"choice"`
+	Round  int    `json:"round"`
+	GameId string `gorm:"column:gameId" json:"-"`
+}

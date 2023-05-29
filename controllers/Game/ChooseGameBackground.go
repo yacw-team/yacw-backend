@@ -1,25 +1,15 @@
 package Game
 
 import (
-	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
-	"github.com/yacw-team/yacw/controllers"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
-
-type gameMessage struct {
-	Uid    string `gorm:"uid"`
-	Story  string
-	Chocie string
-	Round  int
-}
 
 func ChooseGameBackground(c *gin.Context) {
 	var reqBody map[string]interface{}
@@ -49,13 +39,12 @@ func ChooseGameBackground(c *gin.Context) {
 		return
 	}
 
-	//检查一下之前是否有这个用户的历史，有则删除
 	uid, err := utils.Encrypt(apiKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
 	}
-
+	//检查一下之前是否有这个用户的历史，有则删除
 	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
@@ -87,35 +76,24 @@ func ChooseGameBackground(c *gin.Context) {
 
 	var result map[string]interface{}
 
-	for {
-		data, err := sendToOpenAI(message, c, systemPrompt, modelId, apiKey)
-		if err != nil {
-			errCode := utils.GPTRequestErrorCode(err)
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
-			return
-		}
-
-		// 将字符数据解析为map[string]interface{}类型
-		err = json.Unmarshal([]byte(data), &result)
-		if err != nil {
-			time.Sleep(3 * time.Second)
-			continue
-		}
-
-		// 检查解析后的JSON数据是否符合预期格式
-		if isValidResult(result) {
-			// 返回JSON响应
-			break
-		}
-		time.Sleep(3 * time.Second)
+	result, err = CheckAndReSend(message, modelId, apiKey)
+	if err != nil {
+		errCode := utils.GPTRequestErrorCode(err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
+		return
 	}
 
-	var gamemessage gameMessage
+	var gamemessage models.GameMessage
 	gamemessage.Uid = uid
 	gamemessage.Story = result["story"].(string)
-	jsonData, _ := json.Marshal(result["choice"].([]interface{}))
+	jsonData, err := json.Marshal(result["choice"].([]interface{}))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
+		return
+	}
 	gamemessage.Chocie = string(jsonData)
 	gamemessage.Round = int(result["round"].(float64))
+	gamemessage.GameId = gameId
 
 	err = utils.DB.Table("gamemessage").Create(&gamemessage).Error
 	if err != nil {
@@ -125,77 +103,4 @@ func ChooseGameBackground(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 
-}
-
-func sendToOpenAI(message []openai.ChatCompletionMessage, c *gin.Context, systemPrompt string, modelId int, apiKey string) (string, error) {
-	// 创建 OpenAI 客户端
-	client := openai.NewClient(apiKey)
-	ctx := context.Background()
-
-	//构造请求体
-	req := openai.ChatCompletionRequest{
-		Model: controllers.Model[modelId],
-		Messages: []openai.ChatCompletionMessage{
-			{
-				Role:    openai.ChatMessageRoleSystem,
-				Content: systemPrompt,
-			},
-		},
-	}
-
-	//获取回复
-	resp, err := client.CreateChatCompletion(ctx, req)
-	if err != nil {
-		return "", err
-	}
-
-	//获取回复
-	assistant := resp.Choices[0].Message.Content
-	return assistant, nil
-}
-
-// 检查生成的格式是否符合预期
-func isValidResult(result map[string]interface{}) bool {
-	// 检查字段是否存在且不为空
-	if result["story"] == nil || result["choice"] == nil || result["round"] == nil {
-		return false
-	}
-
-	// 进一步检查字段值的类型和合法性
-	if _, ok := result["story"].(string); !ok {
-		return false
-	}
-
-	choices, ok := result["choice"].([]interface{})
-	if !ok || len(choices) == 0 {
-		return false
-	}
-
-	validKeys := map[string]bool{
-		"A": true,
-		"B": true,
-		"C": true,
-		"D": true,
-	}
-
-	for _, choice := range choices {
-		choiceMap, ok := choice.(map[string]interface{})
-		if !ok || len(choiceMap) != 1 {
-			return false
-		}
-
-		for key := range choiceMap {
-			if !validKeys[key] {
-				return false
-			}
-		}
-	}
-
-	if round, ok := result["round"].(float64); !ok || round <= 0 {
-		return false
-	}
-
-	// 根据需要添加其他验证规则
-
-	return true
 }
