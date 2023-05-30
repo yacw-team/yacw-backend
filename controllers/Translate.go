@@ -76,9 +76,13 @@ func Translate(c *gin.Context) {
 		style = "normal"
 	}
 
+	if origin == "" {
+		origin = "depended by yourself"
+	}
+
 	//设置翻译的身份
-	system := "You are a translator who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
-	prompt := "Translate this text into " + goal + " with a " + emotion + " tone: "
+	system := "You are a translator and talker who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
+	prompt := "Translate this text into " + goal + " with " + emotion + " tone," + style + " literary form and its original language which is " + origin + ":"
 	//翻译的语句
 	user := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
 
@@ -94,7 +98,7 @@ func Translate(c *gin.Context) {
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: "Translate this text into English with a positive tone:我很高兴见到你。",
+				Content: "Translate this text into English with positive tone,normal literary form and its original language which is chinese:我很高兴见到你。",
 			},
 			{
 				Role:    openai.ChatMessageRoleAssistant,
@@ -102,7 +106,7 @@ func Translate(c *gin.Context) {
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: "Translate this text into English with a negative tone:我很高兴见到你。",
+				Content: "Translate this text into English with negative tone,normal literary form and its original language which is chinese:我很高兴见到你。",
 			},
 			{
 				Role:    openai.ChatMessageRoleAssistant,
