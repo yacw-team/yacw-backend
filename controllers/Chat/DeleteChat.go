@@ -14,12 +14,6 @@ type DeleteChatReqBody struct {
 }
 
 func DeleteChat(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
@@ -28,9 +22,16 @@ func DeleteChat(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apiKey"].(string)
-	chatId := reqBody["chatId"].(string)
-
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	chatId, ok := reqBody["chatId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	slice := []string{apiKey, chatId}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
