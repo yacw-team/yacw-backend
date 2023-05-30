@@ -10,13 +10,6 @@ import (
 
 // CreatePersonality 用户创建personality
 func CreatePersonality(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
-
 	var err error
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
@@ -26,10 +19,26 @@ func CreatePersonality(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	uid := reqBody["apiKey"].(string)
-	name := reqBody["name"].(string)
-	description := reqBody["description"].(string)
-	prompts := reqBody["prompt"].(string)
+	uid, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	name, ok := reqBody["name"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	description, ok := reqBody["description"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	prompts, ok := reqBody["prompt"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	//检测utf-8编码
 	slice := []string{uid, name, description, prompts}
