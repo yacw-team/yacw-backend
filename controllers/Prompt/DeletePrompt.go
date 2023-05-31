@@ -9,12 +9,6 @@ import (
 
 // DeletePrompt 删除用户创建的prompt
 func DeletePrompt(c *gin.Context) {
-  defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
@@ -23,8 +17,16 @@ func DeletePrompt(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apiKey"].(string)
-	promptId := reqBody["promptsId"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	promptId, ok := reqBody["promptsId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey, promptId}
 	if !utils.Utf8Check(slice) {

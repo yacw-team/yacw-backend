@@ -21,9 +21,21 @@ func ChooseGameBackground(c *gin.Context) {
 	reqBody = reqTemp.(map[string]interface{})
 
 	//获取数据
-	apiKey := reqBody["apiKey"].(string)
-	gameId := reqBody["gameId"].(string)
-	modelStr := reqBody["modelId"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	gameId, ok := reqBody["gameId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	modelStr, ok := reqBody["modelId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey, gameId, modelStr}
 	if !utils.Utf8Check(slice) {
@@ -85,7 +97,11 @@ func ChooseGameBackground(c *gin.Context) {
 
 	var gamemessage models.GameMessage
 	gamemessage.Uid = uid
-	gamemessage.Story = result["story"].(string)
+	gamemessage.Story, ok = result["story"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	jsonData, err := json.Marshal(result["choice"].([]interface{}))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})

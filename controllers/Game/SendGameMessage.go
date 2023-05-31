@@ -33,9 +33,21 @@ func SendGameMessage(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apiKey"].(string)
-	choiceId := reqBody["choiceID"].(string)
-	modelStr := reqBody["modelId"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	choiceId, ok := reqBody["choiceID"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	modelStr, ok := reqBody["modelId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey, choiceId, modelStr}
 	if !utils.Utf8Check(slice) {

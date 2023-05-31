@@ -9,12 +9,6 @@ import (
 
 // GetMyPrompt 获取我的prompt
 func GetMyPrompt(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var prompts []models.Prompt
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
@@ -23,7 +17,11 @@ func GetMyPrompt(c *gin.Context) {
 		return
 	}
 	reqBody = reqTemp.(map[string]interface{})
-	apiKey := reqBody["apiKey"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	apiKey, err := utils.Encrypt(apiKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})

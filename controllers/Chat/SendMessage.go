@@ -12,12 +12,6 @@ import (
 
 // SendMessage 发送对话
 func SendMessage(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
@@ -27,9 +21,21 @@ func SendMessage(c *gin.Context) {
 	reqBody = reqTemp.(map[string]interface{})
 
 	//获取数据
-	apiKey := reqBody["apiKey"].(string)
-	user := reqBody["content"].(map[string]interface{})["user"].(string)
-	chatId := reqBody["chatId"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	user, ok := reqBody["content"].(map[string]interface{})["user"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	chatId, ok := reqBody["chatId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey, user, chatId}
 	if !utils.Utf8Check(slice) {
