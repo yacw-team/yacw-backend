@@ -18,12 +18,12 @@ type NewChatResponse struct {
 }
 
 type Content struct {
-	PersonalityId string `json:"personalityId"`
+	PersonalityId int    `json:"personalityId"`
 	User          string `json:"user"`
 }
 
 type ResponseNewContent struct {
-	PersonalityId string `json:"personalityId"`
+	PersonalityId int    `json:"personalityId"`
 	User          string `json:"user"`
 	Assistant     string `json:"assistant"`
 	Title         string `json:"title"`
@@ -62,7 +62,7 @@ func NewChat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
 		return
 	}
-	personalityId, ok := reqBody["content"].(map[string]interface{})["personalityId"].(string)
+	personalityId_s, ok := reqBody["content"].(map[string]interface{})["personalityId"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
 		return
@@ -73,7 +73,7 @@ func NewChat(c *gin.Context) {
 		return
 	}
 
-	slice := []string{apiKey, modelStr, personalityId, user}
+	slice := []string{apiKey, modelStr, user}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
 		return
@@ -84,6 +84,8 @@ func NewChat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
+
+	personalityId, _ := strconv.Atoi(personalityId_s)
 
 	if modelId < 0 || modelId > 6 {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
@@ -112,7 +114,7 @@ func NewChat(c *gin.Context) {
 	chatConversation.Uid = uid
 	chatConversation.ModelId = modelId
 	//人格设置，默认你是个帮手
-	if personalityId == "" {
+	if personalityId == 0 {
 		systemContent = "You are a helper."
 	} else {
 		var personality models.Personality
@@ -140,23 +142,9 @@ func NewChat(c *gin.Context) {
 	assistantMessage.Show = 1
 	//插入系统消息，用户消息，回答的消息
 
-	assistantResponse, err = ChattingWithGPT(apiKey, user, systemContent, modelId)
-
-	if err != nil {
-		errCode := utils.GPTRequestErrorCode(err)
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
-		return
-	}
-
-	assistantMessage.Content = assistantResponse.Choices[0].Message.Content
-	utils.DB.Table("chatmessage").Create(&assistantMessage)
+	assistantResponse, openAIerr_title := ChattingWithGPT(apiKey, user, systemContent, modelId)
 	titleString := "帮我根据以下的文本想一个标题（注意直接返回一个标题，我想直接使用，正式一些，字数在4-6个字）：" + user
-	title, err = ChattingWithGPT(apiKey, titleString, systemContent, modelId)
-	if err != nil {
-		errCode := utils.GPTRequestErrorCode(err)
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
-		return
-	}
+	title, openAIerr_ass := ChattingWithGPT(apiKey, titleString, systemContent, modelId)
 
 	err = utils.DB.Table("chatmessage").Create(&systemMessage).Error
 	if err != nil {
@@ -168,6 +156,28 @@ func NewChat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
+
+	if openAIerr_title != nil || openAIerr_ass != nil {
+		var errCode string
+		chatConversation.Title = ""
+		//插入对话
+		err = utils.DB.Table("chatconversation").Create(&chatConversation).Error
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+			return
+		}
+		if openAIerr_title != nil {
+			errCode = utils.GPTRequestErrorCode(openAIerr_title)
+		} else {
+			errCode = utils.GPTRequestErrorCode(openAIerr_ass)
+		}
+
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
+		return
+	}
+
+	assistantMessage.Content = assistantResponse.Choices[0].Message.Content
+	utils.DB.Table("chatmessage").Create(&assistantMessage)
 
 	chatConversation.Title = title.Choices[0].Message.Content
 	//插入对话
