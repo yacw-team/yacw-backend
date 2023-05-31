@@ -22,6 +22,14 @@ func GetMyPrompt(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
 		return
 	}
+	apiKeyCheck := utils.IsValidApiKey(apiKey)
+	if !apiKeyCheck {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
+
 	apiKey, err := utils.Encrypt(apiKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
