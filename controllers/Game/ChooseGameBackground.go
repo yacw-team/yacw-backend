@@ -8,7 +8,6 @@ import (
 	"github.com/yacw-team/yacw/utils"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 func ChooseGameBackground(c *gin.Context) {
@@ -69,12 +68,23 @@ func ChooseGameBackground(c *gin.Context) {
 		return
 	}
 
+	if modelId < 0 || modelId > 6 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
+		return
+	}
+
 	//获取prompt字段
 	systemPrompt := ""
 
-	err = utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gameId).Find(&systemPrompt).Error
-	if err != nil || strings.EqualFold(systemPrompt, "") {
+	db_result := utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gameId).Find(&systemPrompt)
+	if db_result.Error != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
+
+	//数据库没有查到数据
+	if db_result.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1008"})
 		return
 	}
 

@@ -2,6 +2,7 @@ package Game
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -71,19 +72,18 @@ func SendGameMessage(c *gin.Context) {
 
 	modelId, err := strconv.Atoi(modelStr)
 	if err != nil {
+		fmt.Println(1)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
+		return
+	}
+
+	if modelId < 0 || modelId > 6 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
 		return
 	}
 
 	var gamemessage models.GameMessage
 	err = utils.DB.Table("gamemessage").Where("uid = ?", uid).Find(&gamemessage).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-		return
-	}
-
-	//删除历史记录
-	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
@@ -99,6 +99,7 @@ func SendGameMessage(c *gin.Context) {
 
 	jsonData, err := json.MarshalIndent(gamemessage, "", "  ")
 	if err != nil {
+		fmt.Println(2)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
@@ -108,6 +109,7 @@ func SendGameMessage(c *gin.Context) {
 
 	history, err = transForm(history)
 	if err != nil {
+		fmt.Println(3)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
@@ -143,9 +145,17 @@ func SendGameMessage(c *gin.Context) {
 		return
 	}
 
+	//删除历史记录
+	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
+
 	gamemessage.Story = story
 	jsonData, err = json.Marshal(result["choice"].([]interface{}))
 	if err != nil {
+		fmt.Println(4)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}

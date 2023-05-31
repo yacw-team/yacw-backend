@@ -49,9 +49,13 @@ func DeletePrompt(c *gin.Context) {
 	}
 	id := promptId
 
-	err = utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{}).Error
-	if err != nil {
+	result := utils.DB.Table("prompt").Where("id = ? AND uid = ?", id, uid).Delete(models.Prompt{})
+	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
+		return
+	}
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1008"})
 		return
 	}
 	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "0000"})
