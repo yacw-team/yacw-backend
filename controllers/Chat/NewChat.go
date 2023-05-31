@@ -47,11 +47,31 @@ func NewChat(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apiKey"].(string)
-	modelStr := reqBody["modelId"].(string)
-	chatId := reqBody["chatId"].(string)
-	personalityId_s := reqBody["content"].(map[string]interface{})["personalityId"].(string)
-	user := reqBody["content"].(map[string]interface{})["user"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	modelStr, ok := reqBody["modelId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	chatId, ok := reqBody["chatId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	personalityId_s, ok := reqBody["content"].(map[string]interface{})["personalityId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	user, ok := reqBody["content"].(map[string]interface{})["user"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey, modelStr, user}
 	if !utils.Utf8Check(slice) {

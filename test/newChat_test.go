@@ -3,6 +3,7 @@ package test
 import (
 	"bytes"
 	json2 "encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/yacw-team/yacw/routes"
 	"github.com/yacw-team/yacw/utils"
@@ -78,12 +79,13 @@ func TestNewChatAPIKeyWrong(t *testing.T) {
 	}
 }
 
-func TestNewChatPersonalityIdWrong(t *testing.T) {
+func TestNewChatCatchPanic(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	r := routes.SetupRouter()
-	var tempContent = NewChatContent{PersonalityId: "100", User: "怎么成为一名肌肉男"}
-	var temp = NewChatRequest{ApiKey: apiKey, ModelId: "1", ChatId: "123", Content: tempContent}
+	var temp = gin.H{
+		"apiKey": apiKey,
+	}
 	json, err := json2.Marshal(&temp)
 	reader := bytes.NewReader(json)
 	if err == nil {
