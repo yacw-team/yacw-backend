@@ -89,13 +89,6 @@ func SendGameMessage(c *gin.Context) {
 		return
 	}
 
-	//删除历史记录
-	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-		return
-	}
-
 	//获取背景字段
 	var systemPrompt string
 	err = utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gamemessage.GameId).Find(&systemPrompt).Error
@@ -113,7 +106,6 @@ func SendGameMessage(c *gin.Context) {
 
 	//获取历史信息
 	history := string(jsonData)
-	fmt.Println(history)
 
 	history, err = transForm(history)
 	if err != nil {
@@ -150,6 +142,13 @@ func SendGameMessage(c *gin.Context) {
 	if err != nil {
 		errCode := utils.GPTRequestErrorCode(err)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
+		return
+	}
+
+	//删除历史记录
+	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 
