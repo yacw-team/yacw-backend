@@ -12,12 +12,6 @@ import (
 
 // Translate 翻译
 func Translate(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
@@ -39,15 +33,35 @@ func Translate(c *gin.Context) {
 	ctx := context.Background()
 
 	//原语言
-	origin := reqBody["from"].(string)
+	origin, ok := reqBody["from"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//目标语言
-	goal := reqBody["to"].(string)
+	goal, ok := reqBody["to"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//情感
-	emotion := reqBody["content"].(map[string]interface{})["emotion"].(string)
+	emotion, ok := reqBody["content"].(map[string]interface{})["emotion"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//模型的id
-	modelStr := reqBody["modelId"].(string)
+	modelStr, ok := reqBody["modelId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//文体
-	style := reqBody["content"].(map[string]interface{})["style"].(string)
+	style, ok := reqBody["content"].(map[string]interface{})["style"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{origin, goal, emotion, modelStr, style}
 
@@ -84,7 +98,11 @@ func Translate(c *gin.Context) {
 	system := "You are a translator and talker who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
 	prompt := "Translate this text into " + goal + " with " + emotion + " tone," + style + " literary form and its original language which is " + origin + ":"
 	//翻译的语句
-	user := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
+	user, ok := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	prompt += user
 

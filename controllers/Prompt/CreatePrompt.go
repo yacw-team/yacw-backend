@@ -10,12 +10,6 @@ import (
 
 // CreatePrompt 用户创建prompt
 func CreatePrompt(c *gin.Context) {
-	defer func() {
-		if err := recover(); err != nil {
-			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
-		}
-	}()
 	var err error
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
@@ -25,10 +19,26 @@ func CreatePrompt(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	apiKey := reqBody["apiKey"].(string)
-	modelName := reqBody["name"].(string)
-	description := reqBody["description"].(string)
-	prompts := reqBody["prompts"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	modelName, ok := reqBody["name"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	description, ok := reqBody["description"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	prompts, ok := reqBody["prompts"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	//检测utf-8编码
 	slice := []string{apiKey, modelName, description, prompts}
