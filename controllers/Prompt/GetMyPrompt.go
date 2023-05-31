@@ -40,5 +40,7 @@ func GetMyPrompt(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
-	c.JSON(http.StatusOK, prompts)
+	c.JSON(http.StatusOK, gin.H{
+		"Prompts": prompts,
+	})
 }
