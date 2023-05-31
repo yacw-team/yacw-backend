@@ -2,6 +2,7 @@ package Game
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -71,7 +72,13 @@ func SendGameMessage(c *gin.Context) {
 
 	modelId, err := strconv.Atoi(modelStr)
 	if err != nil {
+		fmt.Println(1)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
+		return
+	}
+
+	if modelId < 0 || modelId > 6 {
+		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
 		return
 	}
 
@@ -99,15 +106,18 @@ func SendGameMessage(c *gin.Context) {
 
 	jsonData, err := json.MarshalIndent(gamemessage, "", "  ")
 	if err != nil {
+		fmt.Println(2)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
 
 	//获取历史信息
 	history := string(jsonData)
+	fmt.Println(history)
 
 	history, err = transForm(history)
 	if err != nil {
+		fmt.Println(3)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
@@ -146,6 +156,7 @@ func SendGameMessage(c *gin.Context) {
 	gamemessage.Story = story
 	jsonData, err = json.Marshal(result["choice"].([]interface{}))
 	if err != nil {
+		fmt.Println(4)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
