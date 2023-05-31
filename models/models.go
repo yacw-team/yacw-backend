@@ -5,7 +5,7 @@ type ErrCode struct {
 }
 
 type Prompt struct {
-	Id          int    `json:"id"`
+	Id          int    `json:"-"`
 	PromptName  string `gorm:"column:promptname" json:"name"`
 	Description string `json:"description"`
 	Prompts     string `json:"prompts"`

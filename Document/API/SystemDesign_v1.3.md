@@ -337,16 +337,14 @@ URL：GET /v1/game/story
 Res:
 
 ```
-{
-		story:[
+[
         {
-						gameId:string,
-						name:string,
-						description:string,
+						GameId:string,
+						Name:string,
+						Description:string,
         },
         ...
-		],
-}
+]
 ```
 
 
@@ -371,11 +369,10 @@ Res:
 {
     story:string,//故事的发展剧情
     choice:[
-    	A:string,
-    	B:string,
-    	C:string,
-    	D:string,
-    	...
+    	{A:string},
+    	{B:string},
+    	{C:string},
+    	{D:string},
     ],
     round:int,
 }
@@ -403,10 +400,10 @@ Res:
 {
 	story:string,//故事的发展剧情
     choice:[
-    	A:string,
-    	B:string,
-    	C:string,
-    	D:string,
+    	{A:string},
+    	{B:string},
+    	{C:string},
+    	{D:string},
     	...
     ],//(A,B,C,D四个选项)
     round:int,

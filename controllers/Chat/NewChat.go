@@ -2,11 +2,13 @@ package Chat
 
 import (
 	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/controllers"
 	"github.com/yacw-team/yacw/models"
 	"github.com/yacw-team/yacw/utils"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -18,12 +20,12 @@ type NewChatResponse struct {
 }
 
 type Content struct {
-	PersonalityId string `json:"personalityId"`
+	PersonalityId int    `json:"personalityId"`
 	User          string `json:"user"`
 }
 
 type ResponseNewContent struct {
-	PersonalityId string `json:"personalityId"`
+	PersonalityId int    `json:"personalityId"`
 	User          string `json:"user"`
 	Assistant     string `json:"assistant"`
 	Title         string `json:"title"`
@@ -33,6 +35,7 @@ type ResponseNewContent struct {
 func NewChat(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
+			fmt.Println(err)
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
 			// 进行适当的处理
 		}
@@ -56,10 +59,10 @@ func NewChat(c *gin.Context) {
 	apiKey := reqBody["apiKey"].(string)
 	modelStr := reqBody["modelId"].(string)
 	chatId := reqBody["chatId"].(string)
-	personalityId := reqBody["content"].(map[string]interface{})["personalityId"].(string)
+	personalityId_f := reqBody["content"].(map[string]interface{})["personalityId"].(float64)
 	user := reqBody["content"].(map[string]interface{})["user"].(string)
 
-	slice := []string{apiKey, modelStr, personalityId, user}
+	slice := []string{apiKey, modelStr, user}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
 		return
@@ -70,6 +73,8 @@ func NewChat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
+
+	personalityId := int(math.Ceil(personalityId_f))
 
 	if modelId < 0 || modelId > 6 {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1005"})
@@ -98,7 +103,7 @@ func NewChat(c *gin.Context) {
 	chatConversation.Uid = uid
 	chatConversation.ModelId = modelId
 	//人格设置，默认你是个帮手
-	if personalityId == "" {
+	if personalityId == 0 {
 		systemContent = "You are a helper."
 	} else {
 		var personality models.Personality
