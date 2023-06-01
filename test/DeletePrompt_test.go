@@ -22,8 +22,9 @@ type RequestDeletePrompt struct {
 func TestDeletePromptCorrectExample(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	uid, _ := utils.Encrypt(apiKey)
 	var prompts []models.Prompt
-	err := utils.DB.Table("prompt").Where("designer = ? AND prompts = ?", 1, "111").Find(&prompts).Error
+	err := utils.DB.Table("prompt").Where("uid=?", uid).Find(&prompts).Error
 	if err == nil {
 		requestDeletePrompt := &RequestDeletePrompt{
 			Apikey:    apiKey,
@@ -117,7 +118,7 @@ func TestDeletePromptPromptsIdNoExist(t *testing.T) {
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestDeletePrompt := &RequestDeletePrompt{
 		Apikey:    apiKey,
-		PromptsId: "100",
+		PromptsId: "10000",
 	}
 	jsonStr, _ := json.Marshal(requestDeletePrompt)
 	req, err := http.NewRequest("POST", "/api/v1/chat/deleteprompts", bytes.NewBuffer(jsonStr))
