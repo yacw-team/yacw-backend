@@ -11,7 +11,7 @@ import (
 
 func TestGetPromptShopCorrectExample(t *testing.T) {
 	utils.InitDBTest()
-	req, err := http.NewRequest("GET", "/api/v1/chat/prompts", nil)
+	req, err := http.NewRequest("GET", "/api/v1/chat/prompts?type=工具", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

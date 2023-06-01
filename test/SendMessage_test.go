@@ -22,6 +22,26 @@ type RequestSendMessage struct {
 	Content Content `json:"content"`
 }
 
+func TestSendMessageCorrectExample(t *testing.T) {
+	utils.InitDBTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendMessage := &RequestSendMessage{
+		ApiKey: apiKey,
+		ChatId: "123",
+		Content: Content{
+			User: "再多说一些",
+		},
+	}
+	jsonStr, _ := json.Marshal(requestSendMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	assert.Equal(t, rr.Code, http.StatusOK)
+}
+
 func TestSendMessageMissingLength(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MISSING")
