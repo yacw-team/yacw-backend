@@ -25,7 +25,7 @@ func InitDBTest() {
 
 func InitDBNilTest() {
 	var err error
-	DB, err = gorm.Open(sqlite.Open("databaseNullTest.db"), &gorm.Config{})
+	DB, err = gorm.Open(sqlite.Open("databaseNilTest.db"), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}

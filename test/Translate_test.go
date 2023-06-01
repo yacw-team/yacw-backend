@@ -47,7 +47,7 @@ func TestTranslateCorrectExample(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	assert.Equal(t, http.StatusInternalServerError, rr.Code)
+	assert.Equal(t, rr.Code, http.StatusOK)
 }
 
 func TestTranslateMissingLength(t *testing.T) {
