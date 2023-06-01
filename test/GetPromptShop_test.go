@@ -31,3 +31,15 @@ func TestGetPromptShopDataBaseNil(t *testing.T) {
 	expected := `{"Prompts":[]}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestGetPromptShopDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	req, err := http.NewRequest("GET", "/api/v1/chat/prompts", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
+	assert.Equal(t, expected, rr.Body.String())
+}

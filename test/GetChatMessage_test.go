@@ -141,3 +141,21 @@ func TestGetChatMessageChatIdMixing(t *testing.T) {
 	expected := `{"errCode":"2006"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestGetChatMessageDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestChatMessage := &RequestChatMessage{
+		ApiKey: apiKey,
+		ChatId: "1",
+	}
+	jsonStr, _ := json.Marshal(requestChatMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/getmessage", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
+	assert.Equal(t, expected, rr.Body.String())
+}

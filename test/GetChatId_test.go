@@ -109,3 +109,22 @@ func TestGetChatIdApiKeyNull(t *testing.T) {
 	expected := `{"errCode":"3004"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestGetChatIdDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	var err error
+	var req *http.Request
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestChatId := &RequestChatId{
+		ApiKey: apiKey,
+	}
+	jsonStr, _ := json.Marshal(requestChatId)
+	req, err = http.NewRequest("POST", "/api/v1/chat/getchat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
+	assert.Equal(t, expected, rr.Body.String())
+}

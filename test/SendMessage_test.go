@@ -186,3 +186,45 @@ func TestSendMessageChatIdMixing(t *testing.T) {
 	expected := `{"errCode":"1005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestSendMessageDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendMessage := &RequestSendMessage{
+		ApiKey: apiKey,
+		ChatId: "123",
+		Content: Content{
+			User: "再多说一些",
+		},
+	}
+	jsonStr, _ := json.Marshal(requestSendMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestSendMessageDataBaseNil(t *testing.T) {
+	utils.InitDBNilTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendMessage := &RequestSendMessage{
+		ApiKey: apiKey,
+		ChatId: "111",
+		Content: Content{
+			User: "再多说一些",
+		},
+	}
+	jsonStr, _ := json.Marshal(requestSendMessage)
+	req, err := http.NewRequest("POST", "/api/v1/chat/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"1005"}`
+	assert.Equal(t, expected, rr.Body.String())
+}

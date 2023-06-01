@@ -18,6 +18,24 @@ type RequestSendGameMessage struct {
 	ModelId  string `json:"modelId"`
 }
 
+func TestSendGameMessageCorrectExample(t *testing.T) {
+	utils.InitDBTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendGameMessage := &RequestSendGameMessage{
+		ApiKey:   apiKey,
+		ChoiceId: "A",
+		ModelId:  "1",
+	}
+	jsonStr, _ := json.Marshal(requestSendGameMessage)
+	req, err := http.NewRequest("POST", "/api/v1/game/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	assert.Equal(t, http.StatusOK, rr.Code)
+}
+
 func TestSendGameMessageMissingLength(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MISSING")
@@ -168,5 +186,24 @@ func TestSendGameMessageChoiceIdNil(t *testing.T) {
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
 	expected := `{"errCode":"2005"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestSendGameMessageDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestSendGameMessage := &RequestSendGameMessage{
+		ApiKey:   apiKey,
+		ChoiceId: "A",
+		ModelId:  "1",
+	}
+	jsonStr, _ := json.Marshal(requestSendGameMessage)
+	req, err := http.NewRequest("POST", "/api/v1/game/chat", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
 	assert.Equal(t, expected, rr.Body.String())
 }

@@ -168,3 +168,22 @@ func TestChooseGameBackgroundModelIdNoExist(t *testing.T) { //没设置错误码
 	expected := `{"errCode":"1005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
+
+func TestChooseGameBackgroundDataBaseNull(t *testing.T) {
+	utils.InitDBNullTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestChooseGameBackground := &RequestChooseGameBackground{
+		ApiKey:  apiKey,
+		GameId:  "1",
+		ModelId: "100",
+	}
+	jsonStr, _ := json.Marshal(requestChooseGameBackground)
+	req, err := http.NewRequest("POST", "/api/v1/game/new", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3009"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
