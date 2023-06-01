@@ -7,9 +7,16 @@ import (
 	"net/http"
 )
 
+type Response struct {
+	Id          string `json:"id" gorm:"id"`
+	PromptName  string `gorm:"column:promptname" json:"name"`
+	Description string `json:"description"`
+	Prompts     string `json:"prompts"`
+}
+
 // GetMyPrompt 获取我的prompt
 func GetMyPrompt(c *gin.Context) {
-	var prompts []models.Prompt
+	var prompts []Response
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
