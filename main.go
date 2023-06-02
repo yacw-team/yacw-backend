@@ -14,7 +14,9 @@ func main() {
 	}
 
 	utils.InitDB()
-
+	if !utils.DatabaseCheck() {
+		os.Exit(1)
+	}
 	r := routes.SetupRouter()
 	err = r.Run()
 	if err != nil {
