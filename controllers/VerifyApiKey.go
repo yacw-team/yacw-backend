@@ -48,7 +48,6 @@ func VerifyApiKey(c *gin.Context) {
 	_, err := client.CreateChatCompletion(ctx, req)
 
 	if err != nil {
-		fmt.Println(err)
 		errCode := utils.GPTRequestErrorCode(err)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
