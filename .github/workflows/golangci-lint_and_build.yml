@@ -38,6 +38,7 @@ jobs:
         run: go test ./test
         env:
           SALT: ${{ secrets.SALT }}
+          API_PATH: ${{ secrets.API_PATH }}
           TEST_OPENAI_KEY: ${{ secrets.TEST_OPENAI_KEY }}
           TEST_OPENAI_KEY_EXCESSIVE: ${{ secrets.TEST_OPENAI_KEY_EXCESSIVE }}
           TEST_OPENAI_KEY_MISSING: ${{ secrets.TEST_OPENAI_KEY_MISSING }}
