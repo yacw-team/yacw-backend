@@ -29,7 +29,6 @@ type ResponseNewContent struct {
 	Title         string `json:"title"`
 }
 
-// NewChat 新建对话API，路由/v1/chat/new
 func NewChat(c *gin.Context) {
 	var response NewChatResponse
 	var maxMessage int
@@ -105,7 +104,6 @@ func NewChat(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
 	}
-	//获取最大的消息id
 	err = utils.DB.Table("chatmessage").Select("COALESCE(MAX(id), 0)").Find(&maxMessage).Error
 	if err != nil {
 		maxMessage = 0
@@ -113,7 +111,6 @@ func NewChat(c *gin.Context) {
 	chatConversation.Id = chatId
 	chatConversation.Uid = uid
 	chatConversation.ModelId = modelId
-	//人格设置，默认你是个帮手
 	if personalityId == 0 {
 		systemContent = "You are a helper."
 	} else {
@@ -140,7 +137,6 @@ func NewChat(c *gin.Context) {
 	assistantMessage.ChatId = chatConversation.Id
 	assistantMessage.Actor = "assistant"
 	assistantMessage.Show = 1
-	//插入系统消息，用户消息，回答的消息
 
 	assistantResponse, openAIerr_title := ChattingWithGPT(apiKey, user, systemContent, modelId)
 	titleString := "帮我根据以下的文本想一个标题（注意直接返回一个标题，我想直接使用，正式一些，字数在4-6个字）：" + user
@@ -160,7 +156,6 @@ func NewChat(c *gin.Context) {
 	if openAIerr_title != nil || openAIerr_ass != nil {
 		var errCode string
 		chatConversation.Title = ""
-		//插入对话
 		err = utils.DB.Table("chatconversation").Create(&chatConversation).Error
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
@@ -180,13 +175,11 @@ func NewChat(c *gin.Context) {
 	utils.DB.Table("chatmessage").Create(&assistantMessage)
 
 	chatConversation.Title = title.Choices[0].Message.Content
-	//插入对话
 	err = utils.DB.Table("chatconversation").Create(&chatConversation).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
-	//返回请求体
 	response.Content.Assistant = assistantResponse.Choices[0].Message.Content
 	response.Content.Title = title.Choices[0].Message.Content
 	response.Content.User = user
@@ -197,7 +190,6 @@ func NewChat(c *gin.Context) {
 
 }
 
-// ChattingWithGPT 调用chatgpt的函数参数有apikey，问题，人格，模型种类
 func ChattingWithGPT(apiKey string, question string, system string, modelId int) (openai.ChatCompletionResponse, error) {
 	client := openai.NewClient(apiKey)
 

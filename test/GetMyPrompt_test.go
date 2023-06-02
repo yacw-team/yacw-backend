@@ -32,7 +32,7 @@ func TestGetMyPromptCorrectExample(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func TestGetMyPromptMissingLength(t *testing.T) { //1
+func TestGetMyPromptMissingLength(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MISSING")
 	requestGetMyPrompt := &RequestGetMyPrompt{
@@ -49,7 +49,7 @@ func TestGetMyPromptMissingLength(t *testing.T) { //1
 	assert.Equal(t, expected, rr.Body.String())
 }
 
-func TestGetMyPromptExcessiveLength(t *testing.T) { //1
+func TestGetMyPromptExcessiveLength(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY_EXCESSIVE")
 	requestGetMyPrompt := &RequestGetMyPrompt{
@@ -66,7 +66,7 @@ func TestGetMyPromptExcessiveLength(t *testing.T) { //1
 	assert.Equal(t, expected, rr.Body.String())
 }
 
-func TestGetMyPromptFormatMixing(t *testing.T) { //1
+func TestGetMyPromptFormatMixing(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY_MIXING")
 	requestGetMyPrompt := &RequestGetMyPrompt{

@@ -150,7 +150,7 @@ func TestChooseGameBackgroundGameIdNoExist(t *testing.T) {
 	assert.Equal(t, expected, rr.Body.String())
 }
 
-func TestChooseGameBackgroundModelIdNoExist(t *testing.T) { //没设置错误码
+func TestChooseGameBackgroundModelIdNoExist(t *testing.T) {
 	utils.InitDBTest()
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestChooseGameBackground := &RequestChooseGameBackground{

@@ -10,7 +10,6 @@ import (
 	"net/http"
 )
 
-// SendMessage 发送对话
 func SendMessage(c *gin.Context) {
 	var reqBody map[string]interface{}
 	reqTemp, ok := c.Get("reqBody")
@@ -20,7 +19,6 @@ func SendMessage(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	//获取数据
 	apiKey, ok := reqBody["apiKey"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
@@ -51,11 +49,9 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	// 创建 OpenAI 客户端
 	client := openai.NewClient(apiKey)
 	ctx := context.Background()
 
-	//查找第一句system
 	var systemMessage models.ChatMessage
 	err := utils.DB.Table("chatmessage").Where("chatid = ? AND actor = ?", chatId, "system").Find(&systemMessage).Error
 	if err != nil {
@@ -68,7 +64,6 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	//查找modelId
 	var modelId int
 	err = utils.DB.Table("chatconversation").Where("id = ?", chatId).Select("modelid").Scan(&modelId).Error
 	if err != nil {
@@ -76,7 +71,6 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	//查找历史的对话
 	var history []string
 	err = utils.DB.Table("chatmessage").Where("chatId = ? AND (actor = ? OR actor = ?)", chatId, "user", "assistant").Select("content").Scan(&history).Error
 
@@ -85,13 +79,11 @@ func SendMessage(c *gin.Context) {
 		return
 	}
 
-	//在最后加入用户的新对话
 	message := append(getMessage(history), openai.ChatCompletionMessage{
 		Role:    openai.ChatMessageRoleUser,
 		Content: user,
 	})
 
-	//在开头加入system字段
 	message = append([]openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
@@ -99,7 +91,6 @@ func SendMessage(c *gin.Context) {
 		},
 	}, message...)
 
-	//构造请求体
 	req := openai.ChatCompletionRequest{
 		Model:    controllers.Model[modelId],
 		Messages: message,
@@ -111,36 +102,30 @@ func SendMessage(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
 	}
-	//获取回复
 	assistant := resp.Choices[0].Message.Content
 
-	//将用户的对话写入数据库
 	err = utils.DB.Table("chatmessage").Create(&models.ChatMessage{
 		Content: user,
 		ChatId:  chatId,
-		Actor:   "user", //代表是用户
-		Show:    1,      //代表要展示
-
+		Actor:   "user",
+		Show:    1,
 	}).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 
-	//将API的回复写入数据库
 	err = utils.DB.Table("chatmessage").Create(&models.ChatMessage{
 		Content: assistant,
 		ChatId:  chatId,
-		Actor:   "assistant", //代表是回复
-		Show:    1,           //代表要展示
-
+		Actor:   "assistant",
+		Show:    1,
 	}).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
 	}
 
-	//将用户的对话和API的回复存入数据库
 	c.JSON(http.StatusOK, gin.H{
 		"chatId": chatId,
 		"content": gin.H{
@@ -150,7 +135,6 @@ func SendMessage(c *gin.Context) {
 	})
 }
 
-// 包装历史信息
 func getMessage(history []string) []openai.ChatCompletionMessage {
 	message := make([]openai.ChatCompletionMessage, 0)
 	var begin int
@@ -161,10 +145,9 @@ func getMessage(history []string) []openai.ChatCompletionMessage {
 		begin = len(history) - 10
 	}
 
-	//包含历史的后10条对话，一问一答
 	for i := begin; i < len(history); i++ {
 		var newMessage openai.ChatCompletionMessage
-		//偶数是用户的,奇数是AI回复
+
 		if i%2 == 0 {
 			newMessage.Role = openai.ChatMessageRoleUser
 			newMessage.Content = history[i]
