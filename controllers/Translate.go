@@ -34,41 +34,18 @@ func Translate(c *gin.Context) {
 
 	//原语言
 	origin, ok := reqBody["from"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	//目标语言
 	goal, ok := reqBody["to"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	//情感
 	emotion, ok := reqBody["content"].(map[string]interface{})["emotion"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	//模型的id
 	modelStr, ok := reqBody["modelId"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	//文体
 	style, ok := reqBody["content"].(map[string]interface{})["style"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
-
-	slice := []string{origin, goal, emotion, modelStr, style}
-
-	if !utils.Utf8Check(slice) {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
-		return
-	}
 
 	modelId, err := strconv.Atoi(modelStr)
 

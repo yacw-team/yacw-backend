@@ -200,7 +200,7 @@ func TestCreatePromptDataBaseNull(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"1010"}`
+	expected := `{"errCode":"3009"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
 
@@ -220,6 +220,26 @@ func TestCreatePromptWrongQuest(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"1010"}`
+	expected := `{"errCode":"2005"}`
+	assert.Equal(t, expected, rr.Body.String())
+}
+
+func TestCreatePromptApiKeySaltNot(t *testing.T) {
+	utils.InitDBTest()
+	apiKey := os.Getenv("TEST_OPENAI_KEY")
+	requestCreatePrompt := &RequestCreatePrompt{
+		ApiKey:      apiKey,
+		Name:        "111",
+		Description: "111",
+		Prompts:     "111",
+	}
+	jsonStr, _ := json.Marshal(requestCreatePrompt)
+	req, err := http.NewRequest("POST", "/api/v1/chat/prompts", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	routes.SetupRouter().ServeHTTP(rr, req)
+	expected := `{"errCode":"3006"}`
 	assert.Equal(t, expected, rr.Body.String())
 }

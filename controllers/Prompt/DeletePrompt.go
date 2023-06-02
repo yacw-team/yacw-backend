@@ -18,21 +18,8 @@ func DeletePrompt(c *gin.Context) {
 	reqBody = reqTemp.(map[string]interface{})
 
 	apiKey, ok := reqBody["apiKey"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
-	promptId, ok := reqBody["promptsId"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
 
-	slice := []string{apiKey, promptId}
-	if !utils.Utf8Check(slice) {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
-		return
-	}
+	promptId, ok := reqBody["promptsId"].(string)
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if !apiKeyCheck {

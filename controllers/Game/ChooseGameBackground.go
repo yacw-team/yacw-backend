@@ -12,6 +12,7 @@ import (
 
 func ChooseGameBackground(c *gin.Context) {
 	var reqBody map[string]interface{}
+
 	reqTemp, ok := c.Get("reqBody")
 	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
@@ -21,26 +22,10 @@ func ChooseGameBackground(c *gin.Context) {
 
 	//获取数据
 	apiKey, ok := reqBody["apiKey"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
-	gameId, ok := reqBody["gameId"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
-	modelStr, ok := reqBody["modelId"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
 
-	slice := []string{apiKey, gameId, modelStr}
-	if !utils.Utf8Check(slice) {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
-		return
-	}
+	gameId, ok := reqBody["gameId"].(string)
+
+	modelStr, ok := reqBody["modelId"].(string)
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if !apiKeyCheck {
@@ -50,13 +35,10 @@ func ChooseGameBackground(c *gin.Context) {
 		return
 	}
 
-	uid, err := utils.Encrypt(apiKey)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
-		return
-	}
+	uid, _ := utils.Encrypt(apiKey)
+
 	//检查一下之前是否有这个用户的历史，有则删除
-	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
+	err := utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
 		return
@@ -77,10 +59,6 @@ func ChooseGameBackground(c *gin.Context) {
 	systemPrompt := ""
 
 	db_result := utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gameId).Find(&systemPrompt)
-	if db_result.Error != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-		return
-	}
 
 	//数据库没有查到数据
 	if db_result.RowsAffected == 0 {
@@ -99,33 +77,18 @@ func ChooseGameBackground(c *gin.Context) {
 	var result map[string]interface{}
 
 	result, err = CheckAndReSend(message, modelId, apiKey)
-	if err != nil {
-		errCode := utils.GPTRequestErrorCode(err)
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
-		return
-	}
 
 	var gamemessage models.GameMessage
 	gamemessage.Uid = uid
 	gamemessage.Story, ok = result["story"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	jsonData, err := json.Marshal(result["choice"].([]interface{}))
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
-		return
-	}
+
 	gamemessage.Chocie = string(jsonData)
 	gamemessage.Round = int(result["round"].(float64))
 	gamemessage.GameId = gameId
 
 	err = utils.DB.Table("gamemessage").Create(&gamemessage).Error
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
-		return
-	}
 
 	c.JSON(http.StatusOK, result)
 

@@ -20,32 +20,14 @@ func CreatePrompt(c *gin.Context) {
 	reqBody = reqTemp.(map[string]interface{})
 
 	apiKey, ok := reqBody["apiKey"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	modelName, ok := reqBody["name"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	description, ok := reqBody["description"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
+
 	prompts, ok := reqBody["prompts"].(string)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
-		return
-	}
 
 	//检测utf-8编码
-	slice := []string{apiKey, modelName, description, prompts}
-	if !utils.Utf8Check(slice) {
-		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
-		return
-	}
 
 	apiKeyCheck := utils.IsValidApiKey(apiKey)
 	if !apiKeyCheck {
