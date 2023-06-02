@@ -26,7 +26,6 @@ WORKDIR /go
 
 # Copy the executable server and database file into the container
 COPY --from=builder /server/server /go
-COPY ./database.db /go
 
 # Expose the port that the server will be running on
 EXPOSE 8080
