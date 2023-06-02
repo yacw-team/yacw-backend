@@ -7,12 +7,11 @@ import (
 	"net/http"
 )
 
-// GetPersonalityShop 获取人格商店的内容
 func GetPersonalityShop(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
+
 		}
 	}()
 	var personality []models.Personality

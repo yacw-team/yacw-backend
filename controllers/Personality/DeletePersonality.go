@@ -12,12 +12,11 @@ type deletePersonalityReqBody struct {
 	PersonalityId string `json:"personalityId"`
 }
 
-// DeletePersonality 删除用户创建的Personality
 func DeletePersonality(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
+
 		}
 	}()
 
@@ -29,7 +28,7 @@ func DeletePersonality(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1010"})
 		return
 	}
-	//检测utf-8编码
+
 	slice := []string{reqBody.ApiKey, reqBody.PersonalityId}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})

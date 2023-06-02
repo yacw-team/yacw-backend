@@ -8,7 +8,6 @@ import (
 	"strings"
 )
 
-// CreatePersonality 用户创建personality
 func CreatePersonality(c *gin.Context) {
 	var err error
 	var reqBody map[string]interface{}
@@ -40,7 +39,6 @@ func CreatePersonality(c *gin.Context) {
 		return
 	}
 
-	//检测utf-8编码
 	slice := []string{uid, name, description, prompts}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
