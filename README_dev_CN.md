@@ -1,6 +1,6 @@
 # Yet Another ChatGPT Web
 
-[English](README.md)
+[English](README_dev.md)
 
 ## 初始化
 
