@@ -72,7 +72,7 @@ func TestDeletePromptExcessiveLength(t *testing.T) {
 		t.Fatal(err)
 	}
 	rr := httptest.NewRecorder()
-	routes.SetupRouter().ServeHTTP(rr, req) //11
+	routes.SetupRouter().ServeHTTP(rr, req)
 	expected := `{"errCode":"3004"}`
 	assert.Equal(t, expected, rr.Body.String())
 }

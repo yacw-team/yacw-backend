@@ -27,7 +27,6 @@ func GetChatMessage(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
-			// 进行适当的处理
 		}
 	}()
 	var requestGetMessage RequestGetMessage
@@ -37,7 +36,6 @@ func GetChatMessage(c *gin.Context) {
 	apiKeyCheck := utils.IsValidApiKey(requestGetMessage.Apikey)
 	if apiKeyCheck {
 		if errRequestGetMessage == nil {
-			//检测utf-8编码
 			slice := []string{requestGetMessage.ChatStr, requestGetMessage.Apikey}
 			if !utils.Utf8Check(slice) {
 				c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
