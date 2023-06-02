@@ -1,4 +1,4 @@
-package controllers
+package Prompt
 
 import (
 	"github.com/gin-gonic/gin"
@@ -9,6 +9,12 @@ import (
 
 // GetPromptShop 获取prompt商店的内容
 func GetPromptShop(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+			// 进行适当的处理
+		}
+	}()
 	var prompts []models.Prompt
 	//获取类型
 	promptsType, has := c.GetQuery("type")

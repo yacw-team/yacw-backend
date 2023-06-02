@@ -11,8 +11,20 @@ import (
 )
 
 func VerifyApiKey(c *gin.Context) {
+	var reqBody map[string]interface{}
+	reqTemp, ok := c.Get("reqBody")
 
-	apiKey := c.PostForm("apiKey")
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2006"})
+		return
+	}
+	reqBody = reqTemp.(map[string]interface{})
+
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{apiKey}
 	if !utils.Utf8Check(slice) {
@@ -37,9 +49,10 @@ func VerifyApiKey(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err)
-		c.JSON(http.StatusUnauthorized, models.ErrCode{ErrCode: "1002"})
+		errCode := utils.GPTRequestErrorCode(err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
 	}
 
-	c.JSON(http.StatusOK, models.ErrCode{ErrCode: "1002"})
+	c.Status(http.StatusOK)
 }

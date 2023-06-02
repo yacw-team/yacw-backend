@@ -27,7 +27,7 @@ func TestSendMessageCorrectExample(t *testing.T) {
 	apiKey := os.Getenv("TEST_OPENAI_KEY")
 	requestSendMessage := &RequestSendMessage{
 		ApiKey: apiKey,
-		ChatId: "1",
+		ChatId: "123",
 		Content: Content{
 			User: "再多说一些",
 		},
@@ -141,7 +141,7 @@ func TestSendMessageChatIdNull(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"2005"}`
+	expected := `{"errCode":"1005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }
 
@@ -183,6 +183,6 @@ func TestSendMessageChatIdMixing(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"errCode":"2005"}`
+	expected := `{"errCode":"1005"}`
 	assert.Equal(t, expected, rr.Body.String())
 }

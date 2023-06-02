@@ -1,4 +1,4 @@
-package controllers
+package Chat
 
 import (
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ type RequestGetChatId struct {
 }
 
 type Chat struct {
-	ChatId int    `json:"chatId"`
+	ChatId string `json:"chatId"`
 	Title  string `json:"title"`
 }
 
@@ -21,6 +21,11 @@ type ResponseGetChatId struct {
 }
 
 func GetChatId(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+		}
+	}()
 	var requestGetChatId RequestGetChatId
 	var responseGetChatId ResponseGetChatId
 	var errRequestGetChatId = c.ShouldBindJSON(&requestGetChatId)

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	openai "github.com/sashabaranov/go-openai"
 	"github.com/yacw-team/yacw/models"
@@ -34,15 +33,35 @@ func Translate(c *gin.Context) {
 	ctx := context.Background()
 
 	//原语言
-	origin := reqBody["from"].(string)
+	origin, ok := reqBody["from"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//目标语言
-	goal := reqBody["to"].(string)
+	goal, ok := reqBody["to"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//情感
-	emotion := reqBody["content"].(map[string]interface{})["emotion"].(string)
+	emotion, ok := reqBody["content"].(map[string]interface{})["emotion"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//模型的id
-	modelStr := reqBody["modelId"].(string)
+	modelStr, ok := reqBody["modelId"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	//文体
-	style := reqBody["content"].(map[string]interface{})["style"].(string)
+	style, ok := reqBody["content"].(map[string]interface{})["style"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	slice := []string{origin, goal, emotion, modelStr, style}
 
@@ -71,16 +90,24 @@ func Translate(c *gin.Context) {
 		style = "normal"
 	}
 
+	if origin == "" {
+		origin = "depended by yourself"
+	}
+
 	//设置翻译的身份
-	system := "You are a translator who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
-	prompt := "Translate this text into " + goal + " with a " + emotion + " tone: "
+	system := "You are a translator and talker who can translate sentences with a given emotion and style. You can't change the meaning of the original sentence because of emotion and style."
+	prompt := "Translate this text into " + goal + " with " + emotion + " tone," + style + " literary form and its original language which is " + origin + ":"
 	//翻译的语句
-	user := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
+	user, ok := reqBody["content"].(map[string]interface{})["preTranslate"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	prompt += user
 
 	req := openai.ChatCompletionRequest{
-		Model:     model[modelId],
+		Model:     Model[modelId],
 		MaxTokens: 100,
 		Messages: []openai.ChatCompletionMessage{
 			{
@@ -89,7 +116,7 @@ func Translate(c *gin.Context) {
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: "Translate this text into English with a positive tone:我很高兴见到你。",
+				Content: "Translate this text into English with positive tone,normal literary form and its original language which is chinese:我很高兴见到你。",
 			},
 			{
 				Role:    openai.ChatMessageRoleAssistant,
@@ -97,7 +124,7 @@ func Translate(c *gin.Context) {
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
-				Content: "Translate this text into English with a negative tone:我很高兴见到你。",
+				Content: "Translate this text into English with negative tone,normal literary form and its original language which is chinese:我很高兴见到你。",
 			},
 			{
 				Role:    openai.ChatMessageRoleAssistant,
@@ -112,8 +139,8 @@ func Translate(c *gin.Context) {
 
 	resp, err := client.CreateChatCompletion(ctx, req)
 	if err != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3001"})
+		errCode := utils.GPTRequestErrorCode(err)
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: errCode})
 		return
 	}
 

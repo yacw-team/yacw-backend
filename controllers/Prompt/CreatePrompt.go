@@ -1,4 +1,4 @@
-package controllers
+package Prompt
 
 import (
 	"github.com/gin-gonic/gin"
@@ -19,19 +19,43 @@ func CreatePrompt(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	uid := reqBody["apiKey"].(string)
-	modelName := reqBody["name"].(string)
-	description := reqBody["description"].(string)
-	prompts := reqBody["prompt"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	modelName, ok := reqBody["name"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	description, ok := reqBody["description"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
+	prompts, ok := reqBody["prompts"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 
 	//检测utf-8编码
-	slice := []string{uid, modelName, description, prompts}
+	slice := []string{apiKey, modelName, description, prompts}
 	if !utils.Utf8Check(slice) {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})
 		return
 	}
 
-	uid, err = utils.Encrypt(uid)
+	apiKeyCheck := utils.IsValidApiKey(apiKey)
+	if !apiKeyCheck {
+		var errCode models.ErrCode
+		errCode.ErrCode = "3004"
+		c.JSON(http.StatusBadRequest, errCode)
+		return
+	}
+
+	uid, err := utils.Encrypt(apiKey)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})

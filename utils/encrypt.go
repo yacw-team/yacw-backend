@@ -14,7 +14,7 @@ const hashLength = 16
 // Encrypt 对apikey进行加盐 哈希 截断
 func Encrypt(input string) (string, error) {
 
-	salt, err := getSalt()
+	salt, err := GetSalt()
 
 	if err != nil {
 		return "", errors.New(err.Error())
@@ -37,7 +37,7 @@ func Encrypt(input string) (string, error) {
 	return result, nil
 }
 
-func getSalt() (string, error) {
+func GetSalt() (string, error) {
 
 	//从环境变量获取盐
 	salt := os.Getenv("SALT")

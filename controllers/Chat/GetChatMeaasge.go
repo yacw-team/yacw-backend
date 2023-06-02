@@ -1,4 +1,4 @@
-package controllers
+package Chat
 
 import (
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ type RequestGetMessage struct {
 }
 
 type ResponseGetMessage struct {
-	ChatId   int       `gorm:"column:chatid" json:"chatId"`
+	ChatId   string    `gorm:"column:chatid" json:"chatId"`
 	Messages []Message `json:"messages"`
 }
 
@@ -24,6 +24,11 @@ type Message struct {
 }
 
 func GetChatMessage(c *gin.Context) {
+	defer func() {
+		if err := recover(); err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2007"})
+		}
+	}()
 	var requestGetMessage RequestGetMessage
 	var responseGetMessage ResponseGetMessage
 	var errRequestGetMessage = c.ShouldBindJSON(&requestGetMessage)
@@ -31,7 +36,6 @@ func GetChatMessage(c *gin.Context) {
 	apiKeyCheck := utils.IsValidApiKey(requestGetMessage.Apikey)
 	if apiKeyCheck {
 		if errRequestGetMessage == nil {
-			//检测utf-8编码
 			slice := []string{requestGetMessage.ChatStr, requestGetMessage.Apikey}
 			if !utils.Utf8Check(slice) {
 				c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1011"})

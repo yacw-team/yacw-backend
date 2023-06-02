@@ -1,4 +1,4 @@
-package controllers
+package Personality
 
 import (
 	"github.com/gin-gonic/gin"
@@ -11,7 +11,11 @@ func GetMyPersonality(c *gin.Context) {
 	var personality []models.Personality
 	var reqBody map[string]interface{}
 	var err error
-	apiKey := reqBody["apiKey"].(string)
+	apiKey, ok := reqBody["apiKey"].(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
+		return
+	}
 	apiKey, err = utils.Encrypt(apiKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})

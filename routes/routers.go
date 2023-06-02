@@ -3,6 +3,10 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/yacw-team/yacw/controllers"
+	"github.com/yacw-team/yacw/controllers/Chat"
+	"github.com/yacw-team/yacw/controllers/Game"
+	"github.com/yacw-team/yacw/controllers/Personality"
+	"github.com/yacw-team/yacw/controllers/Prompt"
 	"net/http"
 	"os"
 	"path"
@@ -11,32 +15,52 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	//添加中间件
-	r.Use(ApiPrefixMiddleware())
-	r.GET("/api/v1/chat/prompts", controllers.GetPromptShop)
-	r.POST("/api/v1/chat/myprompts", AuthMiddleware(), controllers.GetMyPrompt)
-	r.POST("/api/v1/chat/prompts", AuthMiddleware(), controllers.CreatePrompt)
-	r.DELETE("/api/v1/chat/prompts", controllers.DeletePrompt)
-	r.POST("/api/v1/chat/apiKey", controllers.VerifyApiKey)
-	r.GET("/api/v1/chat/personality", controllers.GetPersonalityShop)
-	r.POST("/api/v1/chat/mypersonality", AuthMiddleware(), controllers.GetMyPersonality)
-	r.POST("/api/v1/chat/personality", AuthMiddleware(), controllers.CreatePersonality)
-	r.DELETE("/api/v1/chat/personality", controllers.DeletePersonality)
+	apiPath := os.Getenv("API_PATH")
+	// 使用Cors()中间件处理跨域请求
+	r.Use(corsMiddleware())
+	r.Use(ApiPrefixMiddleware(apiPath))
+	r.GET(apiPath+"/v1/chat/prompts", Prompt.GetPromptShop)
+	r.POST(apiPath+"/v1/chat/myprompts", AuthMiddleware(), Prompt.GetMyPrompt)
+	r.POST(apiPath+"/v1/chat/prompts", AuthMiddleware(), Prompt.CreatePrompt)
+	r.POST(apiPath+"/v1/chat/deleteprompts", AuthMiddleware(), Prompt.DeletePrompt)
+	r.POST(apiPath+"/v1/chat/apiKey", AuthMiddleware(), controllers.VerifyApiKey)
+	r.GET(apiPath+"/v1/chat/personality", Personality.GetPersonalityShop)
+	r.POST(apiPath+"/v1/chat/mypersonality", AuthMiddleware(), Personality.GetMyPersonality)
 
-	r.POST("/api/v1/chat/getmessage", controllers.GetChatMessage)
-	r.POST("/api/v1/chat/getchat", controllers.GetChatId)
+	r.POST(apiPath+"/v1/chat/getmessage", Chat.GetChatMessage)
+	r.POST(apiPath+"/v1/chat/getchat", Chat.GetChatId)
 
-	r.POST("/api/v1/translate/translate", AuthMiddleware(), controllers.Translate)
-	r.POST("/api/v1/chat/chat", AuthMiddleware(), controllers.SendMessage)
-	r.POST("/api/v1/chat/new", AuthMiddleware(), controllers.NewChat)
-	r.DELETE("/api/v1/chat/chat", AuthMiddleware(), controllers.DeleteChat)
+	r.POST(apiPath+"/v1/translate/translate", AuthMiddleware(), controllers.Translate)
+	r.POST(apiPath+"/v1/chat/chat", AuthMiddleware(), Chat.SendMessage)
+	r.POST(apiPath+"/v1/chat/new", AuthMiddleware(), Chat.NewChat)
+	r.POST(apiPath+"/v1/chat/deletechat", AuthMiddleware(), Chat.DeleteChat)
+
+	r.GET(apiPath+"/v1/game/story", Game.GetGameBackground)
+	r.POST(apiPath+"/v1/game/new", AuthMiddleware(), Game.ChooseGameBackground)
+	r.POST(apiPath+"/v1/game/chat", AuthMiddleware(), Game.SendGameMessage)
 	return r
 }
 
 // ApiPrefixMiddleware 中间件添加前缀
-func ApiPrefixMiddleware() gin.HandlerFunc {
-	apiPath := os.Getenv("API_PATH")
+func ApiPrefixMiddleware(apiPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.URL.Path = path.Join(apiPath, c.Request.URL.Path)
+		c.Next()
+	}
+}
+
+// 定义跨域中间件函数
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
 		c.Next()
 	}
 }

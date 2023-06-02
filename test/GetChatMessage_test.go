@@ -120,7 +120,7 @@ func TestGetChatMessageChatIdMiss(t *testing.T) {
 	}
 	rr := httptest.NewRecorder()
 	routes.SetupRouter().ServeHTTP(rr, req)
-	expected := `{"chatId":0,"messages":null}`
+	expected := `{"chatId":"","messages":null}`
 	assert.Equal(t, expected, rr.Body.String())
 }
 
