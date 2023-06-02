@@ -19,7 +19,6 @@ func ChooseGameBackground(c *gin.Context) {
 	}
 	reqBody = reqTemp.(map[string]interface{})
 
-	//获取数据
 	apiKey, ok := reqBody["apiKey"].(string)
 	if !ok {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "1010"})
@@ -55,7 +54,6 @@ func ChooseGameBackground(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3006"})
 		return
 	}
-	//检查一下之前是否有这个用户的历史，有则删除
 	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
@@ -73,7 +71,6 @@ func ChooseGameBackground(c *gin.Context) {
 		return
 	}
 
-	//获取prompt字段
 	systemPrompt := ""
 
 	db_result := utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gameId).Find(&systemPrompt)
@@ -82,13 +79,11 @@ func ChooseGameBackground(c *gin.Context) {
 		return
 	}
 
-	//数据库没有查到数据
 	if db_result.RowsAffected == 0 {
 		c.JSON(http.StatusBadRequest, models.ErrCode{ErrCode: "1008"})
 		return
 	}
-
-	//构造请求体
+	
 	message := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,

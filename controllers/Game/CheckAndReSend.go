@@ -15,16 +15,13 @@ func CheckAndReSend(message []openai.ChatCompletionMessage, modelId int, apiKey 
 			return nil, err
 		}
 
-		// 将字符数据解析为map[string]interface{}类型
 		err = json.Unmarshal([]byte(data), &result)
 		if err != nil {
 			time.Sleep(3 * time.Second)
 			continue
 		}
 
-		// 检查解析后的JSON数据是否符合预期格式
 		if IsValidResult(result) {
-			// 返回JSON响应
 			break
 		}
 		time.Sleep(3 * time.Second)

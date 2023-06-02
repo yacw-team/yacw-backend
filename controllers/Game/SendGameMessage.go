@@ -11,14 +11,12 @@ import (
 	"strconv"
 )
 
-// 发送给API所需的结构
 type SendStructure struct {
 	Story  string              `json:"story"`
 	Choice []map[string]string `json:"choice"`
 	Round  int                 `json:"round"`
 }
 
-// 存在数据库里的结构
 type StoreStructure struct {
 	Story  string `json:"story"`
 	Choice string `json:"choice"`
@@ -72,7 +70,6 @@ func SendGameMessage(c *gin.Context) {
 
 	modelId, err := strconv.Atoi(modelStr)
 	if err != nil {
-		fmt.Println(1)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
@@ -89,7 +86,6 @@ func SendGameMessage(c *gin.Context) {
 		return
 	}
 
-	//获取背景字段
 	var systemPrompt string
 	err = utils.DB.Table("game").Select("systemprompt").Where("gameId = ?", gamemessage.GameId).Find(&systemPrompt).Error
 	if err != nil {
@@ -99,22 +95,18 @@ func SendGameMessage(c *gin.Context) {
 
 	jsonData, err := json.MarshalIndent(gamemessage, "", "  ")
 	if err != nil {
-		fmt.Println(2)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
 
-	//获取历史信息
 	history := string(jsonData)
 
 	history, err = transForm(history)
 	if err != nil {
-		fmt.Println(3)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
 
-	//构造请求体
 	message := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
@@ -145,7 +137,6 @@ func SendGameMessage(c *gin.Context) {
 		return
 	}
 
-	//删除历史记录
 	err = utils.DB.Exec("delete from gamemessage where uid = ?", uid).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "3009"})
@@ -155,7 +146,6 @@ func SendGameMessage(c *gin.Context) {
 	gamemessage.Story = story
 	jsonData, err = json.Marshal(result["choice"].([]interface{}))
 	if err != nil {
-		fmt.Println(4)
 		c.JSON(http.StatusInternalServerError, models.ErrCode{ErrCode: "2005"})
 		return
 	}
@@ -171,7 +161,6 @@ func SendGameMessage(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// 将存储的数据转为正确的json字符串
 func transForm(str string) (string, error) {
 
 	var secondData StoreStructure
@@ -200,10 +189,9 @@ func transForm(str string) (string, error) {
 	return string(sendJSON), nil
 }
 
-// 概要历史信息
 func summarize(str1 string, str2 string, modelId int, apiKey string) (string, error) {
 	prompt := "我将给你两段json，忽略json中的choice字段，帮我融合并且概括一下它的”story“字段的情节，在附带上story字段的重要信息的基础上，尽量的缩短长度（直接输出概括的结果不要附带其他的内容）。"
-	//构造请求体
+
 	message := []openai.ChatCompletionMessage{
 		{
 			Role:    openai.ChatMessageRoleSystem,
