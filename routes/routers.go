@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/yacw-team/yacw/controllers"
 	"github.com/yacw-team/yacw/controllers/Chat"
@@ -17,7 +16,8 @@ func SetupRouter() *gin.Engine {
 	r := gin.Default()
 	//添加中间件
 	apiPath := os.Getenv("API_PATH")
-	fmt.Println(apiPath)
+	// 使用Cors()中间件处理跨域请求
+	r.Use(corsMiddleware())
 	r.Use(ApiPrefixMiddleware(apiPath))
 	r.GET(apiPath+"/v1/chat/prompts", Prompt.GetPromptShop)
 	r.POST(apiPath+"/v1/chat/myprompts", AuthMiddleware(), Prompt.GetMyPrompt)
@@ -45,6 +45,22 @@ func SetupRouter() *gin.Engine {
 func ApiPrefixMiddleware(apiPath string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.URL.Path = path.Join(apiPath, c.Request.URL.Path)
+		c.Next()
+	}
+}
+
+// 定义跨域中间件函数
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(http.StatusOK)
+			return
+		}
+
 		c.Next()
 	}
 }
